@@ -32,7 +32,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        IsCommonEdge.o IsPossibleCandidate.o KSwapKick.o LinKernighan.o \
        LKHmain.o                                                       \
        Make2OptMove.o Make3OptMove.o Make4OptMove.o Make5OptMove.o     \
-       MakeKOptMove.o MergeTourWithBestTour.o MergeWithTour.o          \
+       MakeKOptMove.o MergeTourWithBestTour.o MergeWithTourIPT.o       \
        Minimum1TreeCost.o MinimumSpanningTree.o                        \
        MTSP2TSP.o MTSP_InitialTour.o MTSP_Report.o                     \
        MTSP_WriteSolution.o                                            \
@@ -47,8 +47,8 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        Penalty_TSPPD.o Penalty_TSPTW.o Penalty_VRPB.o                  \
        Penalty_VRPBTW.o Penalty_VRPPD.o                                \
        PDPTW_Reduce.o printff.o PrintParameters.o                      \
-       Random.o ReadCandidates.o ReadLine.o ReadParameters.o           \
-       ReadPenalties.o ReadProblem.o RecordBestTour.o                  \
+       Random.o ReadCandidates.o ReadEdges.o ReadLine.o                \
+       ReadParameters.o ReadPenalties.o ReadProblem.o RecordBestTour.o \
        RecordBetterTour.o RemoveFirstActive.o                          \
        ResetCandidateSet.o RestoreTour.o                               \
        SegmentSize.o Sequence.o SFCTour.o SolveCompressedSubproblem.o  \
@@ -61,7 +61,8 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        Statistics.o StoreTour.o SymmetrizeCandidateSet.o               \
        TrimCandidateSet.o TSPDL_InitialTour.o TSPTW_MakespanCost.o     \
 	   TSPTW_Reduce.o VRPB_Reduce.o BIT.o                              \
-       WriteCandidates.o WritePenalties.o WriteTour.o
+       WriteCandidates.o WritePenalties.o WriteTour.o                  \
+       MergeWithTourGPX2.o gpx.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 

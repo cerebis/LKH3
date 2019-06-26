@@ -206,8 +206,8 @@
  *
  * EDGE_DATA_SECTION :
  * Edges of the graph are specified in either of the two formats allowed in
- * the EDGE_DATA_FORAT entry. If the type is EDGE_LIST, then the edges are given
- * as a sequence of lines of one of the forms
+ * the EDGE_DATA_FORMAT entry. If the type is EDGE_LIST, then the edges are
+ * given as a sequence of lines of one of the forms
  *
  *      <integer> <integer>
  *      <integer> <integer> <integer>
@@ -215,7 +215,6 @@
  * each entry giving the terminal nodes of some edge, and if three integers are
  * given, the last one specifies its weight. The list is terminated y a -1.
  * If the type is ADJ_LIST, the section consists of adjacency lists for nodes.
- * The adjacency list of a node x is specified as
  * The adjacency list of a node x is specified as
  *
  *      <integer> <integer> ... <integer> -1
@@ -555,8 +554,8 @@ void ReadProblem()
     } else
         TSPTW_Makespan = 0;
     if (Salesmen > 1) {
-        if (Salesmen >= Dim)
-            eprintf("Too many salesmen/vehicles (>= DIMENSION)");
+        if (Salesmen > Dim)
+            eprintf("Too many salesmen/vehicles (> DIMENSION)");
         MTSP2TSP();
     }
     if (ProblemType == ACVRP)
@@ -1257,6 +1256,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                 for (j = i; j <= Dim; j++) {
                     if (!fscanint(ProblemFile, &W))
                         eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                    if (j == i)
+                        continue;
                     if (W > INT_MAX / 2 / Precision)
                         W = INT_MAX / 2 / Precision;
                     if (Penalty && W < 0)
@@ -1264,7 +1265,7 @@ static void Read_EDGE_WEIGHT_SECTION()
                     NodeSet[j].C[i] = W;
                     if (Asymmetric) {
                         NodeSet[j].C[i] = W;
-                        if (j != i && W > M)
+                        if (W > M)
                             M = W;
                     }
                 }
@@ -1275,6 +1276,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                 for (j = 1; j <= i; j++) {
                     if (!fscanint(ProblemFile, &W))
                         eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                    if (j == i)
+                        continue;
                     if (W > INT_MAX / 2 / Precision)
                         W = INT_MAX / 2 / Precision;
                     if (Penalty && W < 0)
@@ -1283,7 +1286,7 @@ static void Read_EDGE_WEIGHT_SECTION()
                         NodeSet[i].C[j] = W;
                     if (Asymmetric) {
                         NodeSet[j].C[i] = W;
-                        if (j != i && W > M)
+                        if (W > M)
                             M = W;
                     }
                 }
@@ -1330,15 +1333,16 @@ static void Read_EDGE_WEIGHT_SECTION()
                 for (i = 1; i <= j; i++) {
                     if (!fscanint(ProblemFile, &W))
                         eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                    if (j == i)
+                        continue;
                     if (W > INT_MAX / 2 / Precision)
                         W = INT_MAX / 2 / Precision;
                     if (Penalty && W < 0)
                         eprintf("EDGE_WEIGHT_SECTION: Negative weight");
-                    if (j != i)
-                        NodeSet[j].C[i] = W;
+                    NodeSet[j].C[i] = W;
                     if (Asymmetric) {
                         NodeSet[i].C[j] = W;
-                        if (j != i && W > M)
+                        if (W > M)
                             M = W;
                     }
                 }
@@ -1349,15 +1353,16 @@ static void Read_EDGE_WEIGHT_SECTION()
                 for (i = j; i <= Dim; i++) {
                     if (!fscanint(ProblemFile, &W))
                         eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                    if (j == i)
+                        continue;
                     if (W > INT_MAX / 2 / Precision)
                         W = INT_MAX / 2 / Precision;
                     if (Penalty && W < 0)
                         eprintf("EDGE_WEIGHT_SECTION: Negative weight");
-                    if (j != i)
-                        NodeSet[i].C[j] = W;
+                    NodeSet[i].C[j] = W;
                     if (Asymmetric) {
                         NodeSet[j].C[i] = W;
-                        if (j != i && W > M)
+                        if (W > M)
                             M = W;
                     }
                 }

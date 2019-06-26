@@ -58,6 +58,7 @@ enum InitialTourAlgorithms { BORUVKA, CVRP_ALG, GREEDY, MOORE, MTSP_ALG,
      NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, TSPDL_ALG, WALK
 };
 enum Objectives { MINMAX, MINMAX_SIZE, MINSUM };
+enum RecombinationTypes { IPT, GPX2 };
 
 typedef struct Node Node;
 typedef struct Candidate Candidate;
@@ -69,6 +70,8 @@ typedef Node *(*MoveFunction) (Node * t1, Node * t2, GainType * G0,
                                GainType * Gain);
 typedef int (*CostFunction) (Node * Na, Node * Nb);
 typedef GainType (*PenaltyFunction) (void);
+typedef GainType (*MergeTourFunction) (void);
+MergeTourFunction MergeWithTour;
 
 /* The Node structure is used to represent nodes (cities) of the problem */
 
@@ -140,7 +143,6 @@ struct Node {
     int DemandSum;
     int Size;
     GainType DistanceSum;
-    Node *Route;
     GainType Penalty;
     double ServiceTime;
     int Pickup, Delivery;
@@ -226,6 +228,7 @@ int *CacheVal;  /* Table of cached distances */
 int *CacheSig;  /* Table of the signatures of cached 
                    distances */
 int CandidateFiles;     /* Number of CANDIDATE_FILEs */
+int EdgeFiles;          /* Number of EDGE_FILEs */
 int *CostMatrix;        /* Cost matrix */
 GainType CurrentGain;
 GainType CurrentPenalty;
@@ -305,6 +308,7 @@ int Precision;  /* Internal precision in the representation of
                    transformed distances */
 int PredSucCostAvailable; /* PredCost and SucCost are available */
 unsigned *Rand;           /* Table of random values */
+int Recombination;        /* IPT or GPX2 */
 int RestrictedSearch;     /* Specifies whether the choice of the first
                              edge to be broken is restricted */
 short Reversed; /* Boolean used to indicate whether a tour has 
@@ -347,7 +351,7 @@ int TSPTW_Makespan;
 
 char *ParameterFileName, *ProblemFileName, *PiFileName,
     *TourFileName, *OutputTourFileName, *InputTourFileName,
-    **CandidateFileName, *InitialTourFileName,
+    **CandidateFileName, **EdgeFileName, *InitialTourFileName,
     *SubproblemTourFileName, **MergeTourFileName,
     *MTSPSolutionFileName, *SINTEFSolutionFileName;
 char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat,
@@ -488,9 +492,9 @@ void Make5OptMove(Node * t1, Node * t2, Node * t3, Node * t4,
                   Node * t5, Node * t6, Node * t7, Node * t8,
                   Node * t9, Node * t10, int Case);
 void MakeKOptMove(int K);
-GainType MergeTourWithBestTur(void);
 GainType MergeTourWithBestTour(void);
-GainType MergeWithTour(void);
+GainType MergeWithTourIPT(void);
+GainType MergeWithTourGPX2(void);
 GainType Minimum1TreeCost(int Sparse);
 void MinimumSpanningTree(int Sparse);
 void MTSP2TSP(void);
@@ -535,6 +539,8 @@ void PrintParameters(void);
 void PrintStatistics(void);
 unsigned Random(void);
 int ReadCandidates(int MaxCandidates);
+int ReadCandidates(int MaxCandidates);
+int ReadEdges(int MaxCandidates);
 char *ReadLine(FILE * InputFile);
 void ReadParameters(void);
 int ReadPenalties(void);

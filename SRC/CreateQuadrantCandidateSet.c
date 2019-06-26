@@ -484,9 +484,10 @@ static void NQN(Node * N, int Q, int start, int end, int K)
     Node *T = KDTree[mid], P = { 0 };
     int axis = T->Axis;
 
-    if (K == 0)
+    if (K == 0 || N->FixedTo2)
         return;
-    if (start <= end && T != N && Contains(T, Q, N) &&
+    if (start <= end && T != N && !T->FixedTo2 &&
+        Contains(T, Q, N) &&
         !InCandidateSet(N, T) &&
         (!c || c(N, T) - N->Pi - T->Pi <= Radius) &&
         (d = Distance(N, T) * Precision) <= Radius) {

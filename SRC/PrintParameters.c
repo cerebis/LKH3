@@ -32,6 +32,11 @@ void PrintParameters()
         printff("DEPOT = %d\n", MTSPDepot);
     else
         printff("# DEPOT =\n");
+    if (EdgeFiles == 0)
+        printff("# EDGE_FILE =\n");
+    else
+        for (i = 0; i < EdgeFiles; i++)
+            printff("EDGE_FILE = %s\n", EdgeFileName[i]);
     if (Excess >= 0)
         printff("EXCESS = %g\n", Excess);
     else
@@ -133,6 +138,9 @@ void PrintParameters()
     printff("%sPROBLEM_FILE = %s\n",
             ProblemFileName ? "" : "# ",
             ProblemFileName ? ProblemFileName : "");
+    printff("RECOMBINATION = %s\n", Recombination == IPT ? "IPT" :
+            Recombination == GPX2 ? "GPX2" :
+            "UNKNOWN");
     printff("RESTRICTED_SEARCH = %s\n", RestrictedSearch ? "YES" : "NO");
     printff("RUNS = %d\n", Runs);
     printff("SALESMEN = %d\n", Salesmen);

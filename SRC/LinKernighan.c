@@ -122,7 +122,7 @@ GainType LinKernighan()
                     continue;
                 G0 = C(t1, t2);
                 OldSwaps = Swaps = 0;
-                PenaltyGain = 0;
+                PenaltyGain = Gain = 0;
                 /* Try to find a tour-improving chain of moves */
                 do
                     t2 = Swaps == 0 ? BestMove(t1, t2, &G0, &Gain) :
@@ -130,7 +130,11 @@ GainType LinKernighan()
                 while (t2);
                 if (PenaltyGain > 0 || Gain > 0) {
                     /* An improvement has been found */
+                    #ifdef HAVE_LONG_LONG
                     assert(Gain % Precision == 0);
+                    #else
+                    assert(fmod(Gain, Precision) == 0);
+                    #endif
                     Cost -= Gain / Precision;
                     CurrentPenalty -= PenaltyGain;
                     StoreTour();
@@ -161,7 +165,11 @@ GainType LinKernighan()
         PenaltyGain = 0;
         if (Gain23Used && ((Gain = Gain23()) > 0 || PenaltyGain > 0)) {
             /* An improvement has been found */
+            #ifdef HAVE_LONG_LONG
             assert(Gain % Precision == 0);
+            #else
+            assert(fmod(Gain, Precision) == 0);
+            #endif
             Cost -= Gain / Precision;
             CurrentPenalty -= PenaltyGain;
             TSPTW_CurrentMakespanCost = Cost;

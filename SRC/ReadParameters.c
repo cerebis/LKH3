@@ -73,6 +73,17 @@
  * Specifies the depot node.
  * Default: 1
  *
+ * EDGE_FILE = <string>
+ * Specifies the name of a file of candidate edges in Concorde format.
+ * The first line of the file contains the number of nodes followed by
+ * the number of edges.
+ * Each of the following lines contains the number of the two end nodes of
+ * an edge and its cost. The cost may be omitted. OBS: nodes are numbered
+ * from zero.
+ * It is possible to give more than one EDGE_FILE specification. In this
+ * case the given files are read and the union of their candidate edges is
+ * used as candidate sets.
+ *
  * EOF
  * Terminates the input data. The entry is optional.
  *
@@ -275,6 +286,9 @@
  *    d[i][j] = PRECISION*c[i][j] + pi[i] + pi[j],
  * where d[i][j], c[i][j], pi[i] and pi[j] are all integral.
  * Default: 100 (which corresponds to 2 decimal places).
+ *
+ * RECOMBINATION = { IPT | GPX2 }
+ * Default: IPT
  *
  * RESTRICTED_SEARCH = { YES | NO }
  * Specifies whether the following search pruning technique is used:
@@ -488,6 +502,7 @@ void ReadParameters()
     PatchingCExtended = 0;
     PatchingCRestricted = 0;
     Precision = 100;
+    Recombination = IPT;
     RestrictedSearch = 1;
     RohePartitioning = 0;
     Runs = 0;
@@ -642,6 +657,25 @@ void ReadParameters()
                     eprintf
                         ("(EXTRA_CANDIDATES) Illegal SYMMETRIC specification");
                 ExtraCandidateSetSymmetric = 1;
+            }
+        } else if (!strcmp(Keyword, "EDGE_FILE")) {
+            if (!(Name = GetFileName(0)))
+                eprintf("EDGE_FILE: string expected");
+            if (EdgeFiles == 0) {
+                assert(EdgeFileName = (char **) malloc(sizeof(char *)));
+                EdgeFileName[EdgeFiles++] = Name;
+            } else {
+                int i;
+                for (i = 0; i < EdgeFiles; i++)
+                    if (!strcmp(Name, EdgeFileName[i]))
+                        break;
+                if (i == EdgeFiles) {
+                    assert(EdgeFileName =
+                           (char **) realloc(EdgeFileName,
+                                             (EdgeFiles +
+                                              1) * sizeof(char *)));
+                    EdgeFileName[EdgeFiles++] = Name;
+                }
             }
         } else if (!strcmp(Keyword, "EXTRA_CANDIDATE_SET_TYPE")) {
             if (!(Token = strtok(0, Delimiters)))
@@ -898,6 +932,15 @@ void ReadParameters()
         } else if (!strcmp(Keyword, "PROBLEM_FILE")) {
             if (!(ProblemFileName = GetFileName(0)))
                 eprintf("PROBLEM_FILE: string expected");
+        } else if (!strcmp(Keyword, "RECOMBINATION")) {
+            if (!(Token = strtok(0, Delimiters)))
+                eprintf("RECOMBINATION: string expected");
+            if (!strcmp(Token, "IPT"))
+                Recombination = IPT;
+            else if (!strcmp(Token, "GPX2"))
+                Recombination = GPX2;
+            else
+                eprintf("RECOMBINATION: IPT or GPX2 expected");
         } else if (!strcmp(Keyword, "RESTRICTED_SEARCH")) {
             if (!ReadYesOrNo(&RestrictedSearch))
                 eprintf("RESTRICTED_SEARCH: YES or NO expected");

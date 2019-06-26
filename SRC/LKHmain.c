@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
     if (argc >= 2)
         ParameterFileName = argv[1];
     ReadParameters();
-    MaxMatrixDimension = 10000;
+    MaxMatrixDimension = 20000;
+    MergeWithTour = Recombination == IPT ? MergeWithTourIPT :
+        MergeWithTourGPX2;
     ReadProblem();
     if (SubproblemSize > 0) {
         if (DelaunayPartitioning)

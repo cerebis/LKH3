@@ -1,7 +1,7 @@
 #include "LKH.h"
 
 /*
- * The MergeWithTour function attempts to find a short tour
+ * The MergeWithTourIPT function attempts to find a short tour
  * by merging a given tour, T1, with another tour, T2. 
  * T1 is given by the Suc pointers of its nodes. 
  * T2 is given by the Next pointers of its nodes.
@@ -28,7 +28,7 @@
  *   Physical Review E, Volume 59, Number 4, pp. 4667-4674, 1999.
  */
 
-GainType MergeWithTour()
+GainType MergeWithTourIPT()
 {
     int Rank = 0, Improved1 = 0, Improved2 = 0;
     int SubSize1, SubSize2, MaxSubSize1, NewDimension = 0, Forward;

@@ -35,7 +35,8 @@ void CreateCandidateSet()
         (MaxTrials == 0 &&
          (FirstNode->InitialSuc || InitialTourAlgorithm == SIERPINSKI ||
           InitialTourAlgorithm == MOORE))) {
-        CandidatesRead = ReadCandidates(MaxCandidates);
+        CandidatesRead = ReadCandidates(MaxCandidates) ||
+                         ReadEdges(MaxCandidates);
         AddTourCandidates();
         if (ProblemType == HCP || ProblemType == HPP)
             Ascent();
@@ -46,7 +47,8 @@ void CreateCandidateSet()
     if (MaxCandidates > 0 &&
         (CandidateSetType == QUADRANT || CandidateSetType == NN)) {
         ReadPenalties();
-        if (!(CandidatesRead = ReadCandidates(MaxCandidates)) &&
+        if (!(CandidatesRead = ReadCandidates(MaxCandidates) ||
+                               ReadEdges(MaxCandidates)) &&
             MaxCandidates > 0) {
             if (CandidateSetType == QUADRANT)
                 CreateQuadrantCandidateSet(MaxCandidates);
@@ -71,13 +73,15 @@ void CreateCandidateSet()
         do
             Na->Pi = 0;
         while ((Na = Na->Suc) != FirstNode);
-        CandidatesRead = ReadCandidates(MaxCandidates);
+        CandidatesRead = ReadCandidates(MaxCandidates) ||
+                         ReadEdges(MaxCandidates);
         Cost = Ascent();
         if (Subgradient && SubproblemSize == 0) {
             WritePenalties();
             PiFile = 0;
         }
-    } else if ((CandidatesRead = ReadCandidates(MaxCandidates)) ||
+    } else if ((CandidatesRead = ReadCandidates(MaxCandidates) ||
+                                 ReadEdges(MaxCandidates)) ||
                MaxCandidates == 0) {
         AddTourCandidates();
         if (CandidateSetSymmetric)

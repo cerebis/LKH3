@@ -26,7 +26,7 @@ typedef double GainType;
 #define PLUS_INFINITY DBL_MAX
 #define MINUS_INFINITY -DBL_MAX
 #define GainFormat "%0.0lf"
-#define GainInputFormat "%0.0lf"
+#define GainInputFormat "%lf"
 #endif
 
 #endif
