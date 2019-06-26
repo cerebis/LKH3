@@ -48,6 +48,11 @@ int C_FUNCTION(Node * Na, Node * Nb)
         for (; (Nc = Cand->To); Cand++)
             if (Nc == Nb)
                 return Cand->Cost;
+    
+    if ((Cand = Nb->CandidateSet))
+        for (; (Nc = Cand->To); Cand++)
+            if (Nc == Na)
+                return Cand->Cost;
     if ((Cand = Na->BackboneCandidateSet))
         for (; (Nc = Cand->To); Cand++)
             if (Nc == Nb)

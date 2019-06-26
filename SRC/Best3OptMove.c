@@ -39,7 +39,6 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
     int Case6, BestCase6 = 0, X4, X6;
     int Breadth2 = 0, Breadth4;
 
-    OldSwaps = Swaps;
     if (SUC(t1) != t2)
         Reversed ^= 1;
 
@@ -50,35 +49,30 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
      *     G4 = *G0 - C(t2,T3) + C(T3,T4) 
      *              - C(T4,T5) + C(T5,T6)
      *
-     *  is maximum (= BestG4), and (T5,T6) has not previously been included.
-     *  If during this process a legal move with *Gain > 0 is found, then make
-     *  the move and exit Best3OptMove immediately. 
+     * is maximum (= BestG4), and (T5,T6) has not previously been included.
+     * If during this process a legal move with *Gain > 0 is found, then make
+     * the move and exit Best3OptMove immediately. 
      */
 
     /* Choose (t2,t3) as a candidate edge emanating from t2 */
     for (Nt2 = t2->CandidateSet; (t3 = Nt2->To); Nt2++) {
         if (t3 == t2->Pred || t3 == t2->Suc ||
-            ((G1 = *G0 - Nt2->Cost) <= 0 &&
-             GainCriterionUsed &&
+            ((G1 = *G0 - Nt2->Cost) <= 0 && GainCriterionUsed &&
              ProblemType != HCP && ProblemType != HPP))
             continue;
         if (++Breadth2 > MaxBreadth)
             break;
         /* Choose t4 as one of t3's two neighbors on the tour */
-        for (X4 = !Asymmetric ? 1 : 2; X4 <= 2; X4++) {
+        for (X4 = ProblemType == ATSP ? 2 : 1; X4 <= 2; X4++) {
             t4 = X4 == 1 ? PRED(t3) : SUC(t3);
             if (FixedOrCommon(t3, t4))
                 continue;
             G2 = G1 + C(t3, t4);
             if (X4 == 1 && !Forbidden(t4, t1) &&
-                (CurrentPenalty > 0 ||
-                 TSPTW_Makespan || !c || G2 - c(t4, t1) > 0)) {
-                *Gain = G2 - C(t4, t1);
-                if (CurrentPenalty > 0 || TSPTW_Makespan || *Gain > 0) {
-                    Swap1(t1, t2, t3);
-                    if (Improvement(Gain, t1, t2))
-                        return 0;
-                }
+                (!c || G2 - c(t4, t1) > 0) && (*Gain = G2 - C(t4, t1)) > 0)
+            {
+                Swap1(t1, t2, t3);
+                return 0;
             }
             if (Backtracking && !Excludable(t3, t4))
                 continue;
@@ -86,8 +80,7 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
             /* Choose (t4,t5) as a candidate edge emanating from t4 */
             for (Nt4 = t4->CandidateSet; (t5 = Nt4->To); Nt4++) {
                 if (t5 == t4->Pred || t5 == t4->Suc ||
-                    ((G3 = G2 - Nt4->Cost) <= 0 &&
-                     GainCriterionUsed &&
+                    ((G3 = G2 - Nt4->Cost) <= 0 && GainCriterionUsed &&
                      ProblemType != HCP && ProblemType != HPP) ||
                     (X4 == 2 && !BETWEEN(t2, t5, t3)))
                     continue;
@@ -108,15 +101,10 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
                         continue;
                     G4 = G3 + C(t5, t6);
                     if (!Forbidden(t6, t1) &&
-                        (CurrentPenalty > 0 ||
-                         TSPTW_Makespan || (!c || G4 - c(t6, t1) > 0))) {
-                        *Gain = G4 - C(t6, t1);
-                        if (CurrentPenalty > 0 ||
-                            TSPTW_Makespan || *Gain > 0) {
-                            Make3OptMove(t1, t2, t3, t4, t5, t6, Case6);
-                            if (Improvement(Gain, t1, t2))
-                                return 0;
-                        }
+                        (!c || G4 - c(t6, t1) > 0) &&
+                        (*Gain = G4 - C(t6, t1)) > 0) {
+                        Make3OptMove(t1, t2, t3, t4, t5, t6, Case6);
+                        return 0;
                     }
                     if (GainCriterionUsed && G4 - Precision < t6->Cost)
                         continue;
@@ -148,9 +136,8 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
                         Exclude(t3, t4);
                         Exclude(t5, t6);
                         while ((t = BestSubsequentMove(t1, t, &G, Gain)));
-                        if (PenaltyGain > 0 || *Gain > 0)
+                        if (*Gain > 0)
                             return 0;
-                        OldSwaps = 0;
                         RestoreTour();
                         if (t2 != SUC(t1))
                             Reversed ^= 1;
@@ -159,7 +146,7 @@ Node *Best3OptMove(Node * t1, Node * t2, GainType * G0, GainType * Gain)
             }
         }
     }
-    *Gain = PenaltyGain = 0;
+    *Gain = 0;
     if (T6) {
         /* Make the best 3-opt move */
         Make3OptMove(t1, t2, T3, T4, T5, T6, BestCase6);

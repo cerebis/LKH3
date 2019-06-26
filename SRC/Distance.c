@@ -1,6 +1,6 @@
 #include "LKH.h"
 
-/* 
+/*
  * Functions for computing distances (see TSPLIB).
  *
  * The appropriate function is referenced by the function pointer Distance.
@@ -22,8 +22,7 @@ int Distance_Asymmetric(Node * Na, Node * Nb)
         return M;
     if (abs(Na->Id - Nb->Id) == n)
         return 0;
-    return Na->Id <= n ? OldDistance(Na, Nb - n) :
-                         OldDistance(Nb, Na - n);
+    return Na->Id <= n ? OldDistance(Na, Nb - n) : OldDistance(Nb, Na - n);
 }
 
 int Distance_ATSP(Node * Na, Node * Nb)
@@ -89,8 +88,8 @@ int Distance_FLOOR_3D(Node * Na, Node * Nb)
 int Distance_GEO(Node * Na, Node * Nb)
 {
     int deg;
-    double NaLatitude, NaLongitude, NbLatitude, NbLongitude, min, q1, q2,
-        q3;
+    double NaLatitude, NaLongitude, NbLatitude, NbLongitude, min,
+           q1, q2, q3;
     deg = (int) Na->X;
     min = Na->X - deg;
     NaLatitude = PI * (deg + 5.0 * min / 3.0) / 180.0;
@@ -158,8 +157,8 @@ int Distance_MAX_3D(Node * Na, Node * Nb)
     return dx > dz ? dx : dz;
 }
 
-/* Function for computing the distance in kilometers between two points on 
-   the Earth's surface, based on the high accuracy method by H. Andoyer, 
+/* Function for computing the distance in kilometers between two points on
+   the Earth's surface, based on the high accuracy method by H. Andoyer,
    as described in
    
        "Astronomical Algorithms (2nd Ed.)", pg. 85, Jean Meeus (2000).

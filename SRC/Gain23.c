@@ -67,8 +67,8 @@ GainType Gain23()
                     if (FixedOrCommon(s3, s4))
                         continue;
                     G2 = G1 + C(s3, s4);
-                    /* Try any gainful nonfeasible 2-opt move followed by
-                       a 2-, 3- or 4-opt move */
+                    /* Try any gainful nonfeasible 2-opt move
+                       followed by a 2-, 3- or 4-opt move */
                     if (X4 == 1 && s4 != s1 && !Forbidden(s4, s1) &&
                         2 * SegmentSize(s2, s3) <= Dimension &&
                         (!c || G2 - c(s4, s1) > 0) &&
@@ -95,16 +95,14 @@ GainType Gain23()
                     Breadth4 = 0;
                     /* Try any gainful nonfeasible 3- or 4-opt move
                        folllowed by a 2-opt move */
-                    /* Choose (s4,s5) as a candidate edge emanating from
-                       s4 */
+                    /* Choose (s4,s5) as a candidate edge emanating from s4 */
                     for (Ns4 = s4->CandidateSet; (s5 = Ns4->To); Ns4++) {
                         if (s5 == s4->Pred || s5 == s4->Suc ||
                             (G3 = G2 - Ns4->Cost) <= 0)
                             continue;
                         if (++Breadth4 > MaxBreadth)
                             break;
-                        /* Choose s6 as one of s5's two neighbors on the
-                           tour */
+                        /* Choose s6 as one of s5's two neighbors on the tour */
                         for (X6 = 1; X6 <= 2; X6++) {
                             if (X4 == 2) {
                                 if (X6 == 1) {
@@ -133,8 +131,6 @@ GainType Gain23()
                             G4 = G3 + C(s5, s6);
                             Gain6 = 0;
                             if (!Forbidden(s6, s1) &&
-                                s6 != s1->Pred &&
-                                s6 != s1->Suc &&
                                 (CurrentPenalty > 0 ||
                                  TSPTW_Makespan ||
                                  !c || G4 - c(s6, s1) > 0) &&

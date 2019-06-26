@@ -18,7 +18,7 @@ int ReadEdges(int MaxCandidates)
     node *node_set;
     edge *e, *e_next;
     char line[81];
-    
+
     if (EdgeFiles == 0)
         return 0;
     Dimension = ProblemType != ATSP ? DimensionSaved : 2 * DimensionSaved;
@@ -27,8 +27,7 @@ int ReadEdges(int MaxCandidates)
         if (!(EdgeFile = fopen(EdgeFileName[f], "r")))
             eprintf("Cannot open EDGE_FILE: \"%s\"", EdgeFileName[f]);
         if (TraceLevel >= 1)
-            printff("Reading EDGE_FILE: \"%s\" ... ",
-                    EdgeFileName[f]);
+            printff("Reading EDGE_FILE: \"%s\" ... ", EdgeFileName[f]);
         fscanf(EdgeFile, "%d %d\n", &i, &Edges);
         if (i != Dimension)
             eprintf("EDGE_FILE \"%s\" does not match problem",
@@ -77,5 +76,3 @@ int ReadEdges(int MaxCandidates)
         TrimCandidateSet(MaxCandidates);
     return 1;
 }
-
-

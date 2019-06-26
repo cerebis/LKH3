@@ -29,11 +29,11 @@ void MinimumSpanningTree(int Sparse)
     int d;
 
     Blue = N = FirstNode;
-    Blue->Dad = 0;              /* The root of the tree has no father */
+    Blue->Dad = 0;      /* The root of the tree has no father */
     if (Sparse && Blue->CandidateSet) {
         /* The graph is sparse */
         /* Insert all nodes in the heap */
-        Blue->Loc = 0;          /* A blue node is not in the heap */
+        Blue->Loc = 0;  /* A blue node is not in the heap */
         while ((N = N->Suc) != FirstNode) {
             N->Dad = Blue;
             N->Cost = N->Rank = INT_MAX;

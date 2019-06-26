@@ -3,15 +3,15 @@
 
 /*
  * The SolveKMeansSubproblems function attempts to improve a given tour
- * by means of a partitioning scheme based on K-means clustering. 
+ * by means of a partitioning scheme based on K-means clustering.
  *
  * The overall region containing the nodes is subdivided into K clusters,
- * where K = ceil(Dimension/SubproblemSize). Each cluster together with 
+ * where K = ceil(Dimension/SubproblemSize). Each cluster together with
  * the given tour induces a subproblem consisting of all nodes in the
- * cluster and with edges fixed between nodes that are connected by tour 
- * segments whose interior points do not belong to the cluster.  
+ * cluster and with edges fixed between nodes that are connected by tour
+ * segments whose interior points do not belong to the cluster.
  *  
- * If an improvement is found, the new tour is written to TourFile. 
+ * If an improvement is found, the new tour is written to TourFile.
  * The original tour is given by the SubproblemSuc references of the nodes.
  */
 
@@ -72,10 +72,10 @@ void SolveKMeansSubproblems()
  *
  * The algorithm is accellerated using ideas from
  *
- *     Dan Judd, Philip K. McKinley, Anil K. Jain: 
- *     Large-Scale Parallel Data Clustering. 
- *     IEEE Transactions on Pattern Analysis and 
- *     Machine Intelligence 20(8):871-876 (1998)   
+ *     Dan Judd, Philip K. McKinley, Anil K. Jain:
+ *     Large-Scale Parallel Data Clustering.
+ *     IEEE Transactions on Pattern Analysis and
+ *     Machine Intelligence 20(8):871-876 (1998)
  */
 
 static void KMeansClustering(int K)

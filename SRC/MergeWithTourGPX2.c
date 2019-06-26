@@ -17,45 +17,15 @@
 
 GainType MergeWithTourGPX2()
 {
-    int *red, *blue, *offspring, i, NewDimension = 0;
-    GainType Cost1 = 0, Cost2 = 0, NewCost;
-    Node *N;
-
-    n_cities = Dimension;
-    red = (int *) malloc(n_cities * sizeof(int));
-    blue = (int *) malloc(n_cities * sizeof(int));
-    offspring = (int *) malloc((n_cities + 1) * sizeof(int));
-    Map2Node = (Node **) malloc(n_cities * sizeof(Node *));
+    int NewDimension = 0;
+    GainType Cost1 = 0, ShrunkCost1 = 0, ShrunkCost2 = 0, NewCost;
+    Node *N, *First = 0, *Last;
+    int *red, *blue, *offspring, i;
     GainType Penalty1 = 0, Penalty2 = 0, NewPenalty;
 
     if (Penalty) {
         CurrentPenalty = PLUS_INFINITY;
         Penalty1 = Penalty();
-    }
-    N = FirstNode;
-    do {
-        N->Suc->Pred = N->Next->Prev = N;
-        N->SucSaved = N->Suc;
-    } while ((N = N->Suc) != FirstNode);
-    i = 0;
-    do {
-        Map2Node[i] = N;
-        red[i] = N->Rank = i;
-        i++;
-        Cost1 += C(N, N->Suc) - N->Pi - N->Suc->Pi;
-        if ((N->Suc != N->Prev && N->Suc != N->Next) ||
-            (N->Pred != N->Prev && N->Pred != N->Next))
-            NewDimension++;
-    } while ((N = N->Suc) != FirstNode);
-    if (NewDimension == 0) {
-        free(red);
-        free(blue);
-        free(offspring);
-        free(Map2Node);
-        CurrentPenalty = Penalty1;
-        return Cost1 / Precision;
-    }
-    if (Penalty) {
         N = FirstNode;
         do {
             N->OldSuc = N->Suc;
@@ -67,20 +37,86 @@ GainType MergeWithTourGPX2()
             (N->Suc = N->OldSuc)->Pred = N;
         while ((N = N->Suc) != FirstNode);
     }
+    N = FirstNode;
+    do {
+        N->Suc->Pred = N->Next->Prev = N;
+        N->SucSaved = N->Suc;
+    } while ((N = N->Suc) != FirstNode);
+    i = 0;
+    do {
+        Cost1 += C(N, N->Suc) - N->Pi - N->Suc->Pi;
+        if ((N->Suc == N->Prev || N->Suc == N->Next) &&
+            (N->Pred == N->Prev || N->Pred == N->Next))
+            N->V = 0;
+        else {
+            N->V = 1;
+            NewDimension++;
+            First = N;
+        }
+    } while ((N = N->Suc) != FirstNode);
+    Cost1 /= Precision;
+    if (NewDimension == 0) {
+        CurrentPenalty = Penalty1;
+        return Cost1;
+    }
+
+    /* Shrink the tours. 
+       OldPred and OldSuc represent the shrunken T1. 
+       Prev and Next represent the shrunken T2 */
+    N = First;
+    Last = 0;
+    do {
+        if (N->V) {
+            if (Last)
+                (Last->OldSuc = N)->OldPred = Last;
+            Last = N;
+        }
+    } while ((N = N->Suc) != First);
+    (Last->OldSuc = First)->OldPred = Last;
+    Last = 0;
+    do {
+        if (N->V) {
+            if (Last) {
+                Last->Next = N;
+                if (Last != N->Prev)
+                    N->Prev = Last;
+            }
+            Last = N;
+        }
+    } while ((N = N->Next) != First);
+    Last->Next = First;
+    if (Last != First->Prev)
+        First->Prev = Last;
+
+    n_cities = NewDimension;
+    red = (int *) malloc(n_cities * sizeof(int));
+    blue = (int *) malloc(n_cities * sizeof(int));
+    offspring = (int *) malloc((n_cities + 1) * sizeof(int));
+    Map2Node = (Node **) malloc(n_cities * sizeof(Node *));
+
+    N = First;
+    i = 0;
+    do {
+        Map2Node[i] = N;
+        red[i] = N->Rank = i;
+        i++;
+        ShrunkCost1 += C(N, N->OldSuc) - N->Pi - N->OldSuc->Pi;
+    } while ((N = N->OldSuc) != First);
     i = 0;
     do {
         blue[i++] = N->Rank;
-        Cost2 += C(N, N->Next) - N->Pi - N->Next->Pi;
-    } while ((N = N->Next) != FirstNode);
-    Cost1 /= Precision;
-    Cost2 /= Precision;
+        ShrunkCost2 += C(N, N->Next) - N->Pi - N->Next->Pi;
+    } while ((N = N->Next) != First);
+    ShrunkCost1 /= Precision;
+    ShrunkCost2 /= Precision;
 
+    /* Perform GPX2 recombination */
     NewCost = gpx(red, blue, offspring);
-    
-    if (NewCost >= Cost1 || NewCost >= Cost2) {
-        free(red);
-        free(blue);
+    free(red);
+    free(blue);
+    if (NewCost >= ShrunkCost1 || NewCost >= ShrunkCost2) {
         free(offspring);
+        free(Map2Node);
         CurrentPenalty = Penalty1;
         return Cost1;
     }
@@ -88,9 +124,31 @@ GainType MergeWithTourGPX2()
     for (i = 0; i < n_cities; i++) {
         N = Map2Node[offspring[i]];
         Node *NextN = Map2Node[offspring[i + 1]];
-        N->Suc = NextN;
-        NextN->Pred = N;
+        N->OldSuc = NextN;
+        NextN->OldPred = N;
     }
+    free(offspring);
+    free(Map2Node);
+
+    /* Expand the offspring into a full tour */
+    N = FirstNode;
+    do
+        N->Mark = 0;
+    while ((N = N->Suc) != FirstNode);
+    N = First;
+    N->Mark = N;
+    do {
+        if (!N->Suc->Mark && (!N->V || !N->Suc->V))
+            N->OldSuc = N->Suc;
+        else if (!N->Pred->Mark && (!N->V || !N->Pred->V))
+            N->OldSuc = N->Pred;
+        else if (N->OldSuc->Mark)
+            N->OldSuc = !N->OldPred->Mark ? N->OldPred : First;
+        N->Mark = N;
+    } while ((N = N->OldSuc) != First);
+    do
+        N->OldSuc->Pred = N;
+    while ((N = N->Suc = N->OldSuc) != First);
     if (Penalty) {
         CurrentGain = 1;
         CurrentPenalty = Penalty1 <= Penalty2 ? Penalty1 : Penalty2;
@@ -101,24 +159,23 @@ GainType MergeWithTourGPX2()
                 N->SucSaved->Pred = N;
             while ((N = N->Suc = N->SucSaved) != FirstNode);
             CurrentPenalty = Penalty1;
-            free(red);
-            free(blue);
-            free(offspring);
-            free(Map2Node);
             return Cost1;
         }
         CurrentPenalty = NewPenalty;
     }
     Hash = 0;
-    N = FirstNode;
-    do
-        Hash ^= Rand[N->Id] * Rand[N->Suc->Id];
-    while ((N = N->Suc) != FirstNode);
-    free(red);
-    free(blue);
-    free(offspring);
-    free(Map2Node);
-    if (TraceLevel >= 2)
-        printff("GPX2: " GainFormat "\n",  NewCost);
-    return NewCost;
+    Cost1 = 0;
+    do {
+        Cost1 += C(N, N->OldSuc) - N->Pi - N->OldSuc->Pi;
+        Hash ^= Rand[N->Id] * Rand[N->OldSuc->Id];
+    } while ((N = N->Suc) != First);
+    Cost1 /= Precision;
+    if (TraceLevel >= 2) {
+        printff("GPX2: ");
+        if (Penalty)
+            printff(GainFormat "_" GainFormat "\n", CurrentPenalty, Cost1);
+        else
+            printff(GainFormat "\n", Cost1);
+    }
+    return Cost1;
 }

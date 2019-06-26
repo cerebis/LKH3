@@ -36,7 +36,7 @@ void CreateCandidateSet()
          (FirstNode->InitialSuc || InitialTourAlgorithm == SIERPINSKI ||
           InitialTourAlgorithm == MOORE))) {
         CandidatesRead = ReadCandidates(MaxCandidates) ||
-                         ReadEdges(MaxCandidates);
+            ReadEdges(MaxCandidates);
         AddTourCandidates();
         if (ProblemType == HCP || ProblemType == HPP)
             Ascent();
@@ -48,8 +48,7 @@ void CreateCandidateSet()
         (CandidateSetType == QUADRANT || CandidateSetType == NN)) {
         ReadPenalties();
         if (!(CandidatesRead = ReadCandidates(MaxCandidates) ||
-                               ReadEdges(MaxCandidates)) &&
-            MaxCandidates > 0) {
+              ReadEdges(MaxCandidates)) && MaxCandidates > 0) {
             if (CandidateSetType == QUADRANT)
                 CreateQuadrantCandidateSet(MaxCandidates);
             else if (CandidateSetType == NN) {
@@ -74,28 +73,32 @@ void CreateCandidateSet()
             Na->Pi = 0;
         while ((Na = Na->Suc) != FirstNode);
         CandidatesRead = ReadCandidates(MaxCandidates) ||
-                         ReadEdges(MaxCandidates);
+            ReadEdges(MaxCandidates);
         Cost = Ascent();
         if (Subgradient && SubproblemSize == 0) {
             WritePenalties();
             PiFile = 0;
         }
     } else if ((CandidatesRead = ReadCandidates(MaxCandidates) ||
-                                 ReadEdges(MaxCandidates)) ||
-               MaxCandidates == 0) {
+                ReadEdges(MaxCandidates)) || MaxCandidates == 0) {
         AddTourCandidates();
         if (CandidateSetSymmetric)
             SymmetrizeCandidateSet();
         goto End_CreateCandidateSet;
     } else {
-        if (CandidateSetType != DELAUNAY && MaxCandidates > 0) {
+        if (CandidateSetType != DELAUNAY &&
+            CandidateSetType != POPMUSIC &&
+            MaxCandidates > 0) {
             if (TraceLevel >= 2)
                 printff("Computing lower bound ... ");
             Cost = Minimum1TreeCost(0);
             if (TraceLevel >= 2)
                 printff("done\n");
         } else {
-            CreateDelaunayCandidateSet();
+            if (CandidateSetType == DELAUNAY)
+                CreateDelaunayCandidateSet();
+            else
+                Create_POPMUSIC_CandidateSet(AscentCandidates);
             Na = FirstNode;
             do {
                 Na->BestPi = Na->Pi;
@@ -118,9 +121,7 @@ void CreateCandidateSet()
     LowerBound = (double) Cost / Precision;
     if (TraceLevel >= 1) {
         printff("Lower bound = %0.1f", LowerBound);
-        if (Optimum != MINUS_INFINITY && Optimum != 0 &&
-            ProblemType != CCVRP && ProblemType != TRP &&
-            MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE)
+        if (Optimum != MINUS_INFINITY && Optimum != 0)
             printff(", Gap = %0.2f%%",
                     100.0 * (Optimum - LowerBound) / Optimum);
         if (!PiFile)
@@ -129,11 +130,11 @@ void CreateCandidateSet()
         printff("\n");
     }
     MaxAlpha = (GainType) fabs(Excess * Cost);
-    if (ProblemType != CCVRP && ProblemType != TRP &&
-        MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE &&
-        (A = Optimum * Precision - Cost) > 0 && A < MaxAlpha)
+    if ((A = Optimum * Precision - Cost) > 0 && A < MaxAlpha)
         MaxAlpha = A;
-    if (CandidateSetType == DELAUNAY || MaxCandidates == 0)
+    if (CandidateSetType == DELAUNAY ||
+        CandidateSetType == POPMUSIC ||
+        MaxCandidates == 0)
         OrderCandidateSet(MaxCandidates, MaxAlpha, CandidateSetSymmetric);
     else
         GenerateCandidates(MaxCandidates, MaxAlpha, CandidateSetSymmetric);
@@ -146,19 +147,24 @@ void CreateCandidateSet()
         AddTourCandidates();
     }
     ResetCandidateSet();
-    Na = FirstNode;
-    do {
-        if (!Na->CandidateSet || !Na->CandidateSet[0].To) {
-            if (MaxCandidates == 0)
-                eprintf("MAX_CANDIDATES = 0: Node %d has no candidates",
-                        Na->Id);
-            else
-                eprintf("Node %d has no candidates", Na->Id);
+    if (MaxTrials > 0 ||
+        (InitialTourAlgorithm != SIERPINSKI &&
+         InitialTourAlgorithm != MOORE)) {
+        Na = FirstNode;
+        do {
+            if (!Na->CandidateSet || !Na->CandidateSet[0].To) {
+                if (MaxCandidates == 0)
+                    eprintf
+                        ("MAX_CANDIDATES = 0: Node %d has no candidates",
+                         Na->Id);
+                else
+                    eprintf("Node %d has no candidates", Na->Id);
+            }
         }
+        while ((Na = Na->Suc) != FirstNode);
+        if (!CandidatesRead && SubproblemSize == 0)
+            WriteCandidates();
     }
-    while ((Na = Na->Suc) != FirstNode);
-    if (!CandidatesRead && SubproblemSize == 0)
-        WriteCandidates();
     if (C == C_EXPLICIT) {
         Na = FirstNode;
         do

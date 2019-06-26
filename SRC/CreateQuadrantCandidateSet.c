@@ -475,7 +475,8 @@ static int InCandidateSet(Node * N, Node * T)
  * The NQN function searches KDTree[start:end] in an attempt to
  * find the K quad-nearest neighbors in quadrant Q relative to N. 
  *
- * The function is called from the NearestQuadrantNeighbors function.
+ * The function is called from the NearestQuadrantNeighbors
+ * and the CreateNearestNeighborCandidateSet function.
  */
 
 static void NQN(Node * N, int Q, int start, int end, int K)
@@ -487,6 +488,7 @@ static void NQN(Node * N, int Q, int start, int end, int K)
     if (K == 0 || N->FixedTo2)
         return;
     if (start <= end && T != N && !T->FixedTo2 &&
+        IsPossibleCandidate(N, T) &&
         Contains(T, Q, N) &&
         !InCandidateSet(N, T) &&
         (!c || c(N, T) - N->Pi - T->Pi <= Radius) &&

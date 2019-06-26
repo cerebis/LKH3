@@ -53,7 +53,7 @@ enum EdgeWeightFormats { FUNCTION, FULL_MATRIX, UPPER_ROW, LOWER_ROW,
     UPPER_DIAG_ROW, LOWER_DIAG_ROW, UPPER_COL, LOWER_COL,
     UPPER_DIAG_COL, LOWER_DIAG_COL
 };
-enum CandidateSetTypes { ALPHA, DELAUNAY, NN, QUADRANT };
+enum CandidateSetTypes { ALPHA, DELAUNAY, NN, POPMUSIC, QUADRANT };
 enum InitialTourAlgorithms { BORUVKA, CVRP_ALG, GREEDY, MOORE, MTSP_ALG, 
      NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, TSPDL_ALG, WALK
 };
@@ -307,6 +307,13 @@ GainType PenaltyGain;
 int Precision;  /* Internal precision in the representation of 
                    transformed distances */
 int PredSucCostAvailable; /* PredCost and SucCost are available */
+int POPMUSIC_InitialTour;  /* Specifies whether the first POPMUSIC tour
+                              is used as initial tour for LK */
+int POPMUSIC_MaxNeighbors; /* Maximum number of nearest neighbors used 
+                              as candidates in iterated 3-opt */
+int POPMUSIC_SampleSize;   /* The sample size */
+int POPMUSIC_Solutions;    /* Number of solutions to generate */
+int POPMUSIC_Trials;       /* Maximum trials used for iterated 3-opt */
 unsigned *Rand;           /* Table of random values */
 int Recombination;        /* IPT or GPX2 */
 int RestrictedSearch;     /* Specifies whether the choice of the first
@@ -453,6 +460,7 @@ void CreateCandidateSet(void);
 void CreateDelaunayCandidateSet(void);
 void CreateNearestNeighborCandidateSet(int K);
 void CreateNNCandidateSet(int K);
+void Create_POPMUSIC_CandidateSet(int K);
 void CreateQuadrantCandidateSet(int K);
 GainType CVRP_InitialTour(void);
 void eprintf(const char *fmt, ...);

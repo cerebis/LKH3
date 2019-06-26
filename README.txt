@@ -4,20 +4,20 @@ The code is distributed for research use. The author reserves all rights to
 the code.
 
 
-INSTRUCTIONS FOR INSTALLATION: (Version 3.0.2 - April 2018)
+INSTRUCTIONS FOR INSTALLATION: (Version 3.0.3 - July 2018)
 -----------------------------
 
 The software is available in gzipped tar format:
 
-	LKH-3.0.2.tgz	(approximately 2 MB)
+	LKH-3.0.3.tgz	(approximately 2.3 MB)
 
 Download the software and execute the following UNIX commands:
 
-  	tar xvfz LKH-3.0.2.tgz
-   	cd LKH-3.0.2
+  	tar xvfz LKH-3.0.3.tgz
+   	cd LKH-3.0.3
 	make
 
-An executable file called LKH will now be available in the directory LKH-3.0.2.
+An executable file called LKH will now be available in the directory LKH-3.0.3.
 
 To test the installation run the program by typing ./LKH pr2392.par. 
 Then press return. The program should now solve a TSP instance with 2392 nodes.
@@ -35,6 +35,42 @@ Just edit the first line in SRC/Makefile and execute the commands
 
 	make clean
 	make
+
+CHANGES IN VERSION 3.0.3:
+-------------------------
+
+Candidate sets may now be created by means of POPMUSIC by giving the following
+specification in the parameter file for LKH:
+
+	CANDIDATE_SET_TYPE = POPMUSIC
+
+The value of the parameter MAX_CANDIDATES is used to trim the candidate set.
+There are, however, some other POPMUSIC related parameters. If not specified,
+they will take their default values. These parameters are:
+
+    POPMUSIC_SAMPLE_SIZE = <int>  
+    Sample size.
+    Default: 10.
+
+    POPMUSIC_SOLUTIONS = <int> 
+    Number of solutions to generate.
+    Default: 50.
+
+    POPMUSIC_MAX_NEIGHBORS = <int>
+    Maximum number of nearest neighbors used as candidates in iterated 3-opt for
+    POPMUSIC.
+    Default: 5.
+
+    POPMUSIC_TRIALS = <int>
+    Number of trials used in iterated 3-opt for POPMUSIC. 
+    If the value is zero, the number of trials is the size of the subpath
+    to be optimized.
+    Default: 1.
+
+    POPMUSIC_INITIAL_TOUR = { YES | NO }
+    Specifies whether the first generated POPMUSIC tour is used as
+    initial tour for Lin-Kernighan.
+    Default: NO.
 
 CHANGES IN VERSION 3.0.2:
 -------------------------

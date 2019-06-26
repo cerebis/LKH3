@@ -54,7 +54,7 @@ static int compare(const void *p1, const void *p2);
 float scalbnf(const float x, const int n)
 #endif
 #ifndef HAVE_NEXTAFTERF
-float nextafterf(float x, float y);
+float nextafterf(const float x, const float y);
 #endif
 
 typedef unsigned int cardinal;
@@ -66,7 +66,7 @@ void delaunay(int n)
     edge *l_cw, *r_ccw;
     point **p_sorted;
     Node *N = FirstNode;
-    int Duplicates = 0,i, j;
+    int Duplicates = 0, i, j;
 
     alloc_memory(n);
     for (i = 0; i < n; i++) {
@@ -252,7 +252,7 @@ static void merge(edge * r_cw_l, point * s, edge * l_ccw_r, point * u,
         above_l_cand = c_p_l_cand > 0.0;
         above_r_cand = c_p_r_cand > 0.0;
         if (!above_l_cand && !above_r_cand)
-            break;              /* Finished. */
+            break;      /* Finished. */
 
         /* Advance l_cand ccw, deleting the old l_cand edge, until the 
            "in_circle" test fails. */

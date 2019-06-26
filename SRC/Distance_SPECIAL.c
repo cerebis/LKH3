@@ -17,7 +17,7 @@
 
 int Distance_SPECIAL(Node * Na, Node * Nb)
 {
-    const double GridSize = 100000000;
+    const double GridSize = 1000000.0;
     double dx = Na->X - Nb->X;
     double dy = Na->Y - Nb->Y;
     if (dx < 0)

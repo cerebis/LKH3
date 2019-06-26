@@ -76,7 +76,8 @@ void PrintStatistics()
             printff("Gap.min = %0.4f%%, Gap.avg = %0.4f%%, "
                     "Gap.max = %0.4f%%\n",
                     100.0 * (CostMin - _Optimum) / _Optimum,
-                    100.0 * ((double) CostSum / _Runs - _Optimum) / _Optimum,
+                    100.0 * ((double) CostSum / _Runs -
+                             _Optimum) / _Optimum,
                     100.0 * (CostMax - _Optimum) / _Optimum);
         if (Penalty && PenaltyMin != PLUS_INFINITY)
             printff("Penalty.min = " GainFormat ", Penalty.avg = %0.2f, "
@@ -92,7 +93,8 @@ void PrintStatistics()
             printff("Gap.min = %0.4f%%, Gap.avg = %0.4f%%, "
                     "Gap.max = %0.4f%%\n",
                     100.0 * (PenaltyMin - _Optimum) / _Optimum,
-                    100.0 * ((double) PenaltySum / _Runs - _Optimum) / _Optimum,
+                    100.0 * ((double) PenaltySum / _Runs -
+                             _Optimum) / _Optimum,
                     100.0 * (PenaltyMax - _Optimum) / _Optimum);
     }
     printff("Trials.min = %d, Trials.avg = %0.1f, Trials.max = %d\n",

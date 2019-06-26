@@ -360,7 +360,7 @@ void ReadProblem()
 {
     int i, j, K;
     char *Line, *Keyword;
-    
+
     if (!(ProblemFile = fopen(ProblemFileName, "r")))
         eprintf("Cannot open PROBLEM_FILE: \"%s\"", ProblemFileName);
     if (TraceLevel >= 1)
@@ -435,6 +435,8 @@ void ReadProblem()
             Read_SCALE();
         else if (!strcmp(Keyword, "SERVICE_TIME"))
             Read_SERVICE_TIME();
+        else if (!strcmp(Keyword, "SERVICE_TIME_SECTION"))
+            Read_SERVICE_TIME_SECTION();
         else if (!strcmp(Keyword, "TIME_WINDOW_SECTION"))
             Read_TIME_WINDOW_SECTION();
         else if (!strcmp(Keyword, "TOUR_SECTION"))
@@ -445,7 +447,7 @@ void ReadProblem()
             eprintf("Unknown keyword: %s", Keyword);
     }
     Swaps = 0;
-    
+
     /* Adjust parameters */
     if (Seed == 0)
         Seed = (unsigned) time(0);
@@ -481,6 +483,10 @@ void ReadProblem()
             MaxTrials = Dimension;
         HeapMake(Dimension);
     }
+    if (POPMUSIC_MaxNeighbors > Dimension - 1)
+        POPMUSIC_MaxNeighbors = Dimension - 1;
+    if (POPMUSIC_SampleSize > Dimension)
+        POPMUSIC_SampleSize = Dimension;
     Depot = &NodeSet[MTSPDepot];
     if (ProblemType == CVRP) {
         Node *N;
@@ -493,7 +499,7 @@ void ReadProblem()
             TotalDemand += N->Demand;
         while ((N = N->Suc) != FirstNode);
         MinSalesmen =
-        TotalDemand / Capacity + (TotalDemand % Capacity != 0);
+            TotalDemand / Capacity + (TotalDemand % Capacity != 0);
         if (Salesmen == 1) {
             Salesmen = MinSalesmen;
             if (Salesmen > Dimension)
@@ -634,7 +640,7 @@ void ReadProblem()
         Depot->ServiceTime = 0;
     }
     if (CostMatrix == 0 && Dimension <= MaxMatrixDimension &&
-        Distance != 0 && Distance != Distance_1
+        Distance != 0 && Distance != Distance_1 && Distance != Distance_LARGE
         && Distance != Distance_LARGE && Distance != Distance_ATSP
         && Distance != Distance_MTSP && Distance != Distance_SPECIAL) {
         Node *Ni, *Nj;
@@ -643,7 +649,7 @@ void ReadProblem()
         Ni = FirstNode->Suc;
         do {
             Ni->C =
-            &CostMatrix[(size_t) (Ni->Id - 1) * (Ni->Id - 2) / 2] - 1;
+                &CostMatrix[(size_t) (Ni->Id - 1) * (Ni->Id - 2) / 2] - 1;
             if (ProblemType != HPP || Ni->Id <= Dim)
                 for (Nj = FirstNode; Nj != Ni; Nj = Nj->Suc)
                     Ni->C[Nj->Id] = Fixed(Ni, Nj) ? 0 : Distance(Ni, Nj);
@@ -701,7 +707,7 @@ void ReadProblem()
         SubsequentMoveTypeSpecial = MoveTypeSpecial;
     }
     K = MoveType >= SubsequentMoveType || !SubsequentPatching ?
-    MoveType : SubsequentMoveType;
+        MoveType : SubsequentMoveType;
     if (PatchingC > K)
         PatchingC = K;
     if (PatchingA > 1 && PatchingA >= PatchingC)
@@ -713,7 +719,7 @@ void ReadProblem()
         BestMove = BestSubsequentMove = BestKOptMove;
         if (!SubsequentPatching && SubsequentMoveType <= 5) {
             MoveFunction BestOptMove[] =
-            { 0, 0, Best2OptMove, Best3OptMove,
+                { 0, 0, Best2OptMove, Best3OptMove,
                 Best4OptMove, Best5OptMove
             };
             BestSubsequentMove = BestOptMove[SubsequentMoveType];
@@ -724,7 +730,7 @@ void ReadProblem()
         };
         BestMove = MoveType <= 5 ? BestOptMove[MoveType] : BestKOptMove;
         BestSubsequentMove = SubsequentMoveType <= 5 ?
-        BestOptMove[SubsequentMoveType] : BestKOptMove;
+            BestOptMove[SubsequentMoveType] : BestKOptMove;
     }
     if (MoveTypeSpecial)
         BestMove = BestSpecialOptMove;
@@ -761,12 +767,12 @@ static int TwoDWeightType()
     if (Asymmetric)
         return 0;
     return WeightType == EUC_2D || WeightType == MAX_2D ||
-    WeightType == MAN_2D || WeightType == CEIL_2D ||
-    WeightType == FLOOR_2D ||
-    WeightType == GEO || WeightType == GEOM ||
-    WeightType == GEO_MEEUS || WeightType == GEOM_MEEUS ||
-    WeightType == ATT || WeightType == TOR_2D ||
-    (WeightType == SPECIAL && CoordType == TWOD_COORDS);
+        WeightType == MAN_2D || WeightType == CEIL_2D ||
+        WeightType == FLOOR_2D ||
+        WeightType == GEO || WeightType == GEOM ||
+        WeightType == GEO_MEEUS || WeightType == GEOM_MEEUS ||
+        WeightType == ATT || WeightType == TOR_2D ||
+        (WeightType == SPECIAL && CoordType == TWOD_COORDS);
 }
 
 static int ThreeDWeightType()
@@ -774,10 +780,10 @@ static int ThreeDWeightType()
     if (Asymmetric)
         return 0;
     return WeightType == EUC_3D || WeightType == MAX_3D ||
-    WeightType == MAN_3D || WeightType == CEIL_3D ||
-    WeightType == FLOOR_3D || WeightType == TOR_3D ||
-    WeightType == XRAY1 || WeightType == XRAY2 ||
-    (WeightType == SPECIAL && CoordType == THREED_COORDS);
+        WeightType == MAN_3D || WeightType == CEIL_3D ||
+        WeightType == FLOOR_3D || WeightType == TOR_3D ||
+        WeightType == XRAY1 || WeightType == XRAY2 ||
+        (WeightType == SPECIAL && CoordType == THREED_COORDS);
 }
 
 static void CheckSpecificationPart()
@@ -787,9 +793,9 @@ static void CheckSpecificationPart()
     if (Dimension < 3)
         eprintf("DIMENSION < 3 or not specified");
     if (WeightType == -1 && !Asymmetric && ProblemType != HCP &&
-        ProblemType != HPP)
+        ProblemType != HPP && !EdgeWeightType)
         eprintf("EDGE_WEIGHT_TYPE is missing");
-    if (WeightType == EXPLICIT && WeightFormat == -1)
+    if (WeightType == EXPLICIT && WeightFormat == -1 && !EdgeWeightFormat)
         eprintf("EDGE_WEIGHT_FORMAT is missing");
     if (WeightType == EXPLICIT && WeightFormat == FUNCTION)
         eprintf("Conflicting EDGE_WEIGHT_TYPE and EDGE_WEIGHT_FORMAT");
@@ -800,31 +806,28 @@ static void CheckSpecificationPart()
     if ((ProblemType == ATSP || ProblemType == SOP) &&
         WeightType != EXPLICIT && WeightType != -1)
         eprintf("Conflicting TYPE and EDGE_WEIGHT_TYPE");
-    if ((ProblemType == ATSP || ProblemType == SOP) &&
-        WeightFormat != FULL_MATRIX)
-        eprintf("Conflicting TYPE and EDGE_WEIGHT_FORMAT");
     if (CandidateSetType == DELAUNAY && !TwoDWeightType() &&
         MaxCandidates > 0)
         eprintf
-        ("Illegal EDGE_WEIGHT_TYPE for CANDIDATE_SET_TYPE = DELAUNAY");
+            ("Illegal EDGE_WEIGHT_TYPE for CANDIDATE_SET_TYPE = DELAUNAY");
     if (CandidateSetType == QUADRANT && !TwoDWeightType() &&
         !ThreeDWeightType() && MaxCandidates + ExtraCandidates > 0)
         eprintf
-        ("Illegal EDGE_WEIGHT_TYPE for CANDIDATE_SET_TYPE = QUADRANT");
+            ("Illegal EDGE_WEIGHT_TYPE for CANDIDATE_SET_TYPE = QUADRANT");
     if (ExtraCandidateSetType == QUADRANT && !TwoDWeightType() &&
         !ThreeDWeightType() && ExtraCandidates > 0)
         eprintf
-        ("Illegal EDGE_WEIGHT_TYPE for EXTRA_CANDIDATE_SET_TYPE = "
-         "QUADRANT");
+            ("Illegal EDGE_WEIGHT_TYPE for EXTRA_CANDIDATE_SET_TYPE = "
+             "QUADRANT");
     if (InitialTourAlgorithm == QUICK_BORUVKA && !TwoDWeightType() &&
         !ThreeDWeightType())
         eprintf
-        ("Illegal EDGE_WEIGHT_TYPE for INITIAL_TOUR_ALGORITHM = "
-         "QUICK-BORUVKA");
+            ("Illegal EDGE_WEIGHT_TYPE for INITIAL_TOUR_ALGORITHM = "
+             "QUICK-BORUVKA");
     if (InitialTourAlgorithm == SIERPINSKI && !TwoDWeightType())
         eprintf
-        ("Illegal EDGE_WEIGHT_TYPE for INITIAL_TOUR_ALGORITHM = "
-         "SIERPINSKI");
+            ("Illegal EDGE_WEIGHT_TYPE for INITIAL_TOUR_ALGORITHM = "
+             "SIERPINSKI");
     if (DelaunayPartitioning && !TwoDWeightType())
         eprintf("Illegal EDGE_WEIGHT_TYPE for DELAUNAY specification");
     if (KarpPartitioning && !TwoDWeightType() && !ThreeDWeightType())
@@ -849,7 +852,7 @@ static void CheckSpecificationPart()
 static char *Copy(char *S)
 {
     char *Buffer;
-    
+
     if (!S || strlen(S) == 0)
         return 0;
     assert(Buffer = (char *) malloc(strlen(S) + 1));
@@ -861,7 +864,7 @@ static void CreateNodes()
 {
     Node *Prev = 0, *N = 0;
     int i;
-    
+
     if (Dimension <= 0)
         eprintf("DIMENSION is not positive (or not specified)");
     if (Asymmetric) {
@@ -890,6 +893,24 @@ static void CreateNodes()
     Link(N, FirstNode);
 }
 
+
+static int FixEdge(Node * Na, Node * Nb)
+{
+    if (!Na->FixedTo1 || Na->FixedTo1 == Nb)
+        Na->FixedTo1 = Nb;
+    else if (!Na->FixedTo2 || Na->FixedTo2 == Nb)
+        Na->FixedTo2 = Nb;
+    else
+        return 0;
+    if (!Nb->FixedTo1 || Nb->FixedTo1 == Na)
+        Nb->FixedTo1 = Na;
+    else if (!Nb->FixedTo2 || Nb->FixedTo1 == Na)
+        Nb->FixedTo2 = Na;
+    else
+        return 0;
+    return 1;
+}
+
 static void Read_NAME()
 {
     if (!(Name = Copy(strtok(0, Delimiters))))
@@ -899,7 +920,7 @@ static void Read_NAME()
 static void Read_BACKHAUL_SECTION()
 {
     int Id;
-    
+
     while (fscanint(ProblemFile, &Id) && Id != -1) {
         if (Id <= 0 || Id > Dim)
             eprintf("BACKHAUL_SECTION: Node number out of range: %d", Id);
@@ -911,7 +932,7 @@ static void Read_BACKHAUL_SECTION()
 static void Read_CAPACITY()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%d", &Capacity))
         eprintf("CAPACITY: Integer expected");
 }
@@ -919,7 +940,7 @@ static void Read_CAPACITY()
 static void Read_DEMAND_DIMENSION()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%d", &DemandDimension))
         eprintf("DIMENSION_DIMENSION: Integer expected");
     if (DemandDimension < 0)
@@ -930,7 +951,7 @@ static void Read_DEMAND_SECTION()
 {
     int Id, Demand, i, k;
     Node *N;
-    
+
     for (i = 1; i <= Dim; i++) {
         fscanint(ProblemFile, &Id);
         if (Id <= 0 || Id > Dim)
@@ -964,7 +985,7 @@ static void Read_DEPOT_SECTION()
 static void Read_DIMENSION()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%d", &Dimension))
         eprintf("DIMENSION: Integer expected");
     if (Dimension < 0)
@@ -976,14 +997,14 @@ static void Read_DISPLAY_DATA_SECTION()
 {
     Node *N;
     int Id, i;
-    
+
     CheckSpecificationPart();
     if (ProblemType == HPP)
         Dimension--;
     if (!DisplayDataType || strcmp(DisplayDataType, "TWOD_DISPLAY"))
         eprintf
-        ("DISPLAY_DATA_SECTION conflicts with DISPLAY_DATA_TYPE: %s",
-         DisplayDataType);
+            ("DISPLAY_DATA_SECTION conflicts with DISPLAY_DATA_TYPE: %s",
+             DisplayDataType);
     if (!FirstNode)
         CreateNodes();
     N = FirstNode;
@@ -1021,7 +1042,7 @@ static void Read_DISPLAY_DATA_SECTION()
 static void Read_DISPLAY_DATA_TYPE()
 {
     unsigned int i;
-    
+
     if (!(DisplayDataType = Copy(strtok(0, Delimiters))))
         eprintf("DISPLAY_DATA_TYPE: string expected");
     for (i = 0; i < strlen(DisplayDataType); i++)
@@ -1035,7 +1056,7 @@ static void Read_DISPLAY_DATA_TYPE()
 static void Read_DISTANCE()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%lf", &DistanceLimit))
         eprintf("DISTANCE: real expected");
 }
@@ -1044,21 +1065,23 @@ static void Read_DRAFT_LIMIT_SECTION()
 {
     int Id, i;
     Node *N;
-    
+
     for (i = 1; i <= Dim; i++) {
         fscanint(ProblemFile, &Id);
         if (Id <= 0 || Id > Dim)
-            eprintf("DRAFT_LIMIT_SECTION: Node number out of range: %d", Id);
+            eprintf("DRAFT_LIMIT_SECTION: Node number out of range: %d",
+                    Id);
         N = &NodeSet[Id];
         if (!fscanint(ProblemFile, &N->DraftLimit))
-            eprintf("DRAFT_LIMIT_SECTION: Missing draft limit for node %d", Id);
+            eprintf("DRAFT_LIMIT_SECTION: Missing draft limit for node %d",
+                    Id);
     }
 }
 
 static void Read_EDGE_DATA_FORMAT()
 {
     unsigned int i;
-    
+
     if (!(EdgeDataFormat = Copy(strtok(0, Delimiters))))
         eprintf("EDGE_DATA_FORMAT: string expected");
     for (i = 0; i < strlen(EdgeDataFormat); i++)
@@ -1076,7 +1099,7 @@ static void Read_EDGE_DATA_SECTION()
     Node *Ni, *Nj;
     int i, j, W = 0, WithWeights = 0, FirstLine = 1;
     char *Line;
-    
+
     CheckSpecificationPart();
     if (!EdgeDataFormat)
         eprintf("Missing EDGE_DATA_FORMAT specification");
@@ -1084,26 +1107,24 @@ static void Read_EDGE_DATA_SECTION()
         CreateNodes();
     if (ProblemType == HPP)
         Dimension--;
-    Line = ReadLine(ProblemFile);
-    if (sscanf(Line, "%d %d %d\n", &i, &j, &W) == 3)
-        WithWeights = 1;
-    while (i != -1) {
-        if (i <= 0 ||
-            i > (ProblemType != ATSP ? Dimension : Dimension / 2))
-            eprintf("(EDGE_DATA_SECTION) Node number out of range: %d", i);
-        if (ProblemType == ATSP)
-            i += Dimension / 2;
-        if (!FirstLine)
-            fscanint(ProblemFile, &j);
-        while (j != -1) {
+    if (!strcmp(EdgeDataFormat, "EDGE_LIST")) {
+        Line = ReadLine(ProblemFile);
+        if (sscanf(Line, "%d %d %d\n", &i, &j, &W) == 3)
+            WithWeights = 1;
+        while (i != -1) {
+            if (i <= 0 ||
+                i > (Asymmetric ? Dimension : Dimension / 2))
+                eprintf("(EDGE_DATA_SECTION) Node number out of range: %d", i);
+            if (!FirstLine)
+                fscanint(ProblemFile, &j);
             if (j <= 0
-                || j > (ProblemType != ATSP ? Dimension : Dimension / 2))
+                || j > (!Asymmetric ? Dimension : Dimension / 2))
                 eprintf("(EDGE_DATA_SECTION) Node number out of range: %d",
                         j);
             if (i == j)
                 eprintf("(EDGE_DATA_SECTION) Illegal edge: %d to %d",
                         i, j);
-            if (ProblemType == ATSP)
+            if (Asymmetric)
                 j += Dimension / 2;
             Ni = &NodeSet[i];
             Nj = &NodeSet[j];
@@ -1113,25 +1134,57 @@ static void Read_EDGE_DATA_SECTION()
                 W *= Precision;
             }
             AddCandidate(Ni, Nj, W, 1);
-            if (ProblemType != ATSP)
-                AddCandidate(Nj, Ni, W, 1);
-            if (!strcmp(EdgeDataFormat, "EDGE_LIST") ||
-                !fscanint(ProblemFile, &j))
-                j = -1;
+            AddCandidate(Nj, Ni, W, 1);
+            FirstLine = 0;
+            if (!fscanint(ProblemFile, &i))
+                i = -1;
         }
-        FirstLine = 0;
+    } else if (!strcmp(EdgeDataFormat, "ADJ_LIST")) {
         if (!fscanint(ProblemFile, &i))
             i = -1;
-    }
+        while (i != -1) {
+            if (i <= 0 ||
+                (!Asymmetric ? Dimension : Dimension / 2))
+                eprintf
+                ("(EDGE_DATA_SECTION) Node number out of range: %d",
+                 i);
+            Ni = &NodeSet[i];
+            fscanint(ProblemFile, &j);
+            while (j != -1) {
+                if (j <= 0 ||
+                    (ProblemType != ATSP ? Dimension : Dimension / 2))
+                    eprintf
+                    ("(EDGE_DATA_SECTION) Node number out of range: %d",
+                     j);
+                if (i == j)
+                    eprintf("(EDGE_DATA_SECTION) Illgal edge: %d to %d",
+                            i, j);
+                if (Asymmetric)
+                    j += Dimension / 2;
+                Nj = &NodeSet[j];
+                AddCandidate(Ni, Nj, 0, 1);
+                AddCandidate(Nj, Ni, 0, 1);
+                fscanint(ProblemFile, &j);
+            }
+            fscanint(ProblemFile, &i);
+        }
+    } else
+        eprintf("(EDGE_DATA_SECTION) No EDGE_DATA_FORMAT specified");
     if (ProblemType == HPP)
         Dimension++;
+    if (Asymmetric) {
+        for (i = 1; i <= DimensionSaved; i++)
+            FixEdge(&NodeSet[i], &NodeSet[i + DimensionSaved]);
+    }
+    WeightType = 1;
+    MaxCandidates = ExtraCandidates = 0;
     Distance = WithWeights ? Distance_LARGE : Distance_1;
 }
 
 static void Read_EDGE_WEIGHT_FORMAT()
 {
     unsigned int i;
-    
+
     if (!(EdgeWeightFormat = Copy(strtok(0, Delimiters))))
         eprintf("EDGE_WEIGHT_FORMAT: string expected");
     for (i = 0; i < strlen(EdgeWeightFormat); i++)
@@ -1164,7 +1217,7 @@ static void Read_EDGE_WEIGHT_SECTION()
 {
     Node *Ni, *Nj;
     int i, j, n, W;
-    
+
     if (ProblemType == SOP && ProblemType != M1_PDTSP) {
         fscanint(ProblemFile, &n);
         if (n != Dimension)
@@ -1181,7 +1234,7 @@ static void Read_EDGE_WEIGHT_SECTION()
         Ni = FirstNode->Suc;
         do {
             Ni->C =
-            &CostMatrix[(size_t) (Ni->Id - 1) * (Ni->Id - 2) / 2] - 1;
+                &CostMatrix[(size_t) (Ni->Id - 1) * (Ni->Id - 2) / 2] - 1;
         }
         while ((Ni = Ni->Suc) != FirstNode);
     } else {
@@ -1193,181 +1246,180 @@ static void Read_EDGE_WEIGHT_SECTION()
     if (ProblemType == HPP)
         Dimension--;
     switch (WeightFormat) {
-        case FULL_MATRIX:
-            for (i = 1; i <= Dim; i++) {
-                Ni = &NodeSet[i];
-                for (j = 1; j <= Dim; j++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
-                    if (Asymmetric) {
-                        Ni->C[j] = W;
-                        if (j != i && W > M)
-                            M = W;
-                    } else if (j < i)
-                        Ni->C[j] = W;
-                    if (i != j && W > M)
+    case FULL_MATRIX:
+        for (i = 1; i <= Dim; i++) {
+            Ni = &NodeSet[i];
+            for (j = 1; j <= Dim; j++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                if (Asymmetric) {
+                    Ni->C[j] = W;
+                    if (j != i && W > M)
+                        M = W;
+                } else if (j < i)
+                    Ni->C[j] = W;
+                if (i != j && W > M)
+                    M = W;
+            }
+        }
+        break;
+    case UPPER_ROW:
+        for (i = 1; i < Dim; i++) {
+            for (j = i + 1, Nj = Ni->Suc; j <= Dim; j++, Nj = Nj->Suc) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[j].C[i] = W;
+                if (Asymmetric) {
+                    NodeSet[i].C[j] = W;
+                    if (j != i && W > M)
                         M = W;
                 }
             }
-            break;
-        case UPPER_ROW:
-            for (i = 1; i < Dim; i++) {
-                for (j = i + 1, Nj = Ni->Suc; j <= Dim;
-                     j++, Nj = Nj->Suc) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+        }
+        break;
+    case LOWER_ROW:
+        for (i = 2; i <= Dim; i++) {
+            for (j = 1; j < i; j++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[i].C[j] = W;
+                if (Asymmetric) {
                     NodeSet[j].C[i] = W;
-                    if (Asymmetric) {
-                        NodeSet[i].C[j] = W;
-                        if (j != i && W > M)
-                            M = W;
-                    }
+                    if (j != i && W > M)
+                        M = W;
                 }
             }
-            break;
-        case LOWER_ROW:
-            for (i = 2; i <= Dim; i++) {
-                for (j = 1; j < i; j++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+        }
+        break;
+    case UPPER_DIAG_ROW:
+        for (i = 1; i <= Dim; i++) {
+            for (j = i; j <= Dim; j++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (j == i)
+                    continue;
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[j].C[i] = W;
+                if (Asymmetric) {
+                    NodeSet[j].C[i] = W;
+                    if (W > M)
+                        M = W;
+                }
+            }
+        }
+        break;
+    case LOWER_DIAG_ROW:
+        for (i = 1; i <= Dim; i++) {
+            for (j = 1; j <= i; j++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (j == i)
+                    continue;
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                if (j != i)
                     NodeSet[i].C[j] = W;
-                    if (Asymmetric) {
-                        NodeSet[j].C[i] = W;
-                        if (j != i && W > M)
-                            M = W;
-                    }
-                }
-            }
-            break;
-        case UPPER_DIAG_ROW:
-            for (i = 1; i <= Dim; i++) {
-                for (j = i; j <= Dim; j++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (j == i)
-                        continue;
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                if (Asymmetric) {
                     NodeSet[j].C[i] = W;
-                    if (Asymmetric) {
-                        NodeSet[j].C[i] = W;
-                        if (W > M)
-                            M = W;
-                    }
+                    if (W > M)
+                        M = W;
                 }
             }
-            break;
-        case LOWER_DIAG_ROW:
-            for (i = 1; i <= Dim; i++) {
-                for (j = 1; j <= i; j++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (j == i)
-                        continue;
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
-                    if (j != i)
-                        NodeSet[i].C[j] = W;
-                    if (Asymmetric) {
-                        NodeSet[j].C[i] = W;
-                        if (W > M)
-                            M = W;
-                    }
-                }
-            }
-            break;
-        case UPPER_COL:
-            for (j = 2; j <= Dim; j++) {
-                for (i = 1; i < j; i++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
-                    NodeSet[j].C[i] = W;
-                    if (Asymmetric) {
-                        NodeSet[i].C[j] = W;
-                        if (j != i && W > M)
-                            M = W;
-                    }
-                }
-            }
-            break;
-        case LOWER_COL:
-            for (j = 1; j < Dim; j++) {
-                for (i = j + 1; i <= Dim; i++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+        }
+        break;
+    case UPPER_COL:
+        for (j = 2; j <= Dim; j++) {
+            for (i = 1; i < j; i++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[j].C[i] = W;
+                if (Asymmetric) {
                     NodeSet[i].C[j] = W;
-                    if (Asymmetric) {
-                        NodeSet[j].C[i] = W;
-                        if (j != i && W > M)
-                            M = W;
-                    }
+                    if (j != i && W > M)
+                        M = W;
                 }
             }
-            break;
-        case UPPER_DIAG_COL:
-            for (j = 1; j <= Dim; j++) {
-                for (i = 1; i <= j; i++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (j == i)
-                        continue;
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+        }
+        break;
+    case LOWER_COL:
+        for (j = 1; j < Dim; j++) {
+            for (i = j + 1; i <= Dim; i++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[i].C[j] = W;
+                if (Asymmetric) {
                     NodeSet[j].C[i] = W;
-                    if (Asymmetric) {
-                        NodeSet[i].C[j] = W;
-                        if (W > M)
-                            M = W;
-                    }
+                    if (j != i && W > M)
+                        M = W;
                 }
             }
-            break;
-        case LOWER_DIAG_COL:
-            for (j = 1; j <= Dim; j++) {
-                for (i = j; i <= Dim; i++) {
-                    if (!fscanint(ProblemFile, &W))
-                        eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                    if (j == i)
-                        continue;
-                    if (W > INT_MAX / 2 / Precision)
-                        W = INT_MAX / 2 / Precision;
-                    if (Penalty && W < 0)
-                        eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+        }
+        break;
+    case UPPER_DIAG_COL:
+        for (j = 1; j <= Dim; j++) {
+            for (i = 1; i <= j; i++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (j == i)
+                    continue;
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[j].C[i] = W;
+                if (Asymmetric) {
                     NodeSet[i].C[j] = W;
-                    if (Asymmetric) {
-                        NodeSet[j].C[i] = W;
-                        if (W > M)
-                            M = W;
-                    }
+                    if (W > M)
+                        M = W;
                 }
             }
-            break;
+        }
+        break;
+    case LOWER_DIAG_COL:
+        for (j = 1; j <= Dim; j++) {
+            for (i = j; i <= Dim; i++) {
+                if (!fscanint(ProblemFile, &W))
+                    eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                if (j == i)
+                    continue;
+                if (W > INT_MAX / 2 / Precision)
+                    W = INT_MAX / 2 / Precision;
+                if (Penalty && W < 0)
+                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                NodeSet[i].C[j] = W;
+                if (Asymmetric) {
+                    NodeSet[j].C[i] = W;
+                    if (W > M)
+                        M = W;
+                }
+            }
+        }
+        break;
     }
     if (ProblemType == HPP)
         Dimension++;
@@ -1384,7 +1436,7 @@ static void Read_EDGE_WEIGHT_SECTION()
 static void Read_EDGE_WEIGHT_TYPE()
 {
     unsigned int i;
-    
+
     if (!(EdgeWeightType = Copy(strtok(0, Delimiters))))
         eprintf("EDGE_WEIGHT_TYPE: string expected");
     for (i = 0; i < strlen(EdgeWeightType); i++)
@@ -1496,7 +1548,7 @@ static void Read_FIXED_EDGES_SECTION()
 {
     Node *Ni, *Nj, *N, *NPrev = 0, *NNext;
     int i, j, Count = 0;
-    
+
     CheckSpecificationPart();
     if (!FirstNode)
         CreateNodes();
@@ -1538,7 +1590,7 @@ static void Read_FIXED_EDGES_SECTION()
 static void Read_GRID_SIZE()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%lf", &GridSize))
         eprintf("GRID_SIZE: real expected");
     if (GridSize < 0)
@@ -1549,7 +1601,7 @@ static void Read_NODE_COORD_SECTION()
 {
     Node *N;
     int Id, i;
-    
+
     CheckSpecificationPart();
     if (CoordType != TWOD_COORDS && CoordType != THREED_COORDS)
         eprintf("NODE_COORD_SECTION conflicts with NODE_COORD_TYPE: %s",
@@ -1602,7 +1654,7 @@ static void Read_NODE_COORD_SECTION()
 static void Read_NODE_COORD_TYPE()
 {
     unsigned int i;
-    
+
     if (!(NodeCoordType = Copy(strtok(0, Delimiters))))
         eprintf("NODE_COORD_TYPE: string expected");
     for (i = 0; i < strlen(NodeCoordType); i++)
@@ -1629,8 +1681,8 @@ static void Read_PICKUP_AND_DELIVERY_SECTION()
             eprintf("PICKUP_AND_DELIVERY_SECTION: Missing nodes");
         if (Id <= 0 || Id > Dim)
             eprintf
-            ("PICKUP_AND_DELIVERY_SECTION: Node number out of range: %d",
-             Id);
+                ("PICKUP_AND_DELIVERY_SECTION: Node number out of range: %d",
+                 Id);
         N = &NodeSet[Id];
         if (N->V == 1)
             eprintf("PICKUP_AND_DELIVERY_SECTION: "
@@ -1726,7 +1778,7 @@ static void Read_TOUR_SECTION(FILE ** File)
 {
     Node *First = 0, *Last = 0, *N, *Na;
     int i, k;
-    
+
     if (TraceLevel >= 1) {
         printff("Reading ");
         if (File == &InitialTourFile)
@@ -1761,10 +1813,10 @@ static void Read_TOUR_SECTION(FILE ** File)
     }
     for (k = 0; k <= Dimension && i != -1; k++) {
         if (i <= 0 || i > Dimension)
-            eprintf("TOUR_SECTION: Node number out of range: %d", i);
+            eprintf("(TOUR_SECTION) Node number out of range: %d", i);
         N = &NodeSet[i];
         if (N->V == 1 && k != Dimension)
-            eprintf("TOUR_SECTION: Node number occurs twice: %d", N->Id);
+            eprintf("(TOUR_SECTION) Node number occurs twice: %d", N->Id);
         N->V = 1;
         if (k == 0)
             First = Last = N;
@@ -1849,7 +1901,7 @@ static void Read_TOUR_SECTION(FILE ** File)
 static void Read_TYPE()
 {
     unsigned int i;
-    
+
     if (!(Type = Copy(strtok(0, Delimiters))))
         eprintf("TYPE: string expected");
     for (i = 0; i < strlen(Type); i++)
@@ -1916,32 +1968,32 @@ static void Read_TYPE()
     } else
         eprintf("Unknown TYPE: %s", Type);
     Asymmetric =
-    ProblemType == ATSP ||
-    ProblemType == CCVRP ||
-    ProblemType == ACVRP ||
-    ProblemType == CVRPTW ||
-    ProblemType == M_PDTSP ||
-    ProblemType == M1_PDTSP ||
-    ProblemType == ONE_PDTSP ||
-    ProblemType == OVRP ||
-    ProblemType == PDTSP ||
-    ProblemType == PDTSPF ||
-    ProblemType == PDTSPL ||
-    ProblemType == PDPTW ||
-    ProblemType == RCTVRP ||
-    ProblemType == RCTVRPTW ||
-    ProblemType == SOP ||
-    ProblemType == TRP ||
-    ProblemType == TSPDL ||
-    ProblemType == TSPTW ||
-    ProblemType == VRPB ||
-    ProblemType == VRPBTW || ProblemType == VRPPD;
+        ProblemType == ATSP ||
+        ProblemType == CCVRP ||
+        ProblemType == ACVRP ||
+        ProblemType == CVRPTW ||
+        ProblemType == M_PDTSP ||
+        ProblemType == M1_PDTSP ||
+        ProblemType == ONE_PDTSP ||
+        ProblemType == OVRP ||
+        ProblemType == PDTSP ||
+        ProblemType == PDTSPF ||
+        ProblemType == PDTSPL ||
+        ProblemType == PDPTW ||
+        ProblemType == RCTVRP ||
+        ProblemType == RCTVRPTW ||
+        ProblemType == SOP ||
+        ProblemType == TRP ||
+        ProblemType == TSPDL ||
+        ProblemType == TSPTW ||
+        ProblemType == VRPB ||
+        ProblemType == VRPBTW || ProblemType == VRPPD;
 }
 
 static void Read_SERVICE_TIME()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%lf", &ServiceTime))
         eprintf("SERVICE_TIME: Real expected");
     if (ServiceTime < 0)
@@ -1952,7 +2004,7 @@ static void Read_SERVICE_TIME_SECTION()
 {
     int Id, i;
     Node *N;
-    
+
     for (i = 1; i <= Dim; i++) {
         fscanint(ProblemFile, &Id);
         if (Id <= 0 || Id > Dim)
@@ -1992,7 +2044,7 @@ void ReadTour(char *FileName, FILE ** File)
     char *Line, *Keyword, *Token;
     unsigned int i;
     int Done = 0;
-    
+
     if (!(*File = fopen(FileName, "r")))
         eprintf("Cannot open tour file: \"%s\"", FileName);
     while ((Line = ReadLine(*File))) {
@@ -2028,8 +2080,8 @@ void ReadTour(char *FileName, FILE ** File)
                 printff("Dim = %d, DimensionSaved = %d, Dimension = %d\n",
                         Dim, DimensionSaved, Dimension);
                 eprintf
-                ("[%s] (DIMENSION): does not match problem dimension\n",
-                 FileName);
+                    ("[%s] (DIMENSION): does not match problem dimension",
+                     FileName);
             }
         } else if (!strcmp(Keyword, "PICKUP_AND_DELIVERY_SECTION")) {
             Read_PICKUP_AND_DELIVERY_SECTION();
@@ -2051,7 +2103,7 @@ void ReadTour(char *FileName, FILE ** File)
 static void Read_RISK_THRESHOLD()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%d", &RiskThreshold))
         eprintf("RISK_THRESHOLD: Integer expected");
 }
@@ -2059,7 +2111,7 @@ static void Read_RISK_THRESHOLD()
 static void Read_SALESMEN()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || (Salesmen == 1 && !sscanf(Token, "%d", &Salesmen)))
         eprintf("SALESMEN/VEHICLES: Integer expected");
     if (Salesmen <= 0)
@@ -2069,35 +2121,18 @@ static void Read_SALESMEN()
 static void Read_SCALE()
 {
     char *Token = strtok(0, Delimiters);
-    
+
     if (!Token || !sscanf(Token, "%d", &Scale))
         eprintf("SCALE: Integer expected");
     if (Scale < 1)
         eprintf("SCALE: < 1");
 }
 
-static int FixEdge(Node * Na, Node * Nb)
-{
-    if (!Na->FixedTo1 || Na->FixedTo1 == Nb)
-        Na->FixedTo1 = Nb;
-    else if (!Na->FixedTo2 || Na->FixedTo2 == Nb)
-        Na->FixedTo2 = Nb;
-    else
-        return 0;
-    if (!Nb->FixedTo1 || Nb->FixedTo1 == Na)
-        Nb->FixedTo1 = Na;
-    else if (!Nb->FixedTo2 || Nb->FixedTo1 == Na)
-        Nb->FixedTo2 = Na;
-    else
-        return 0;
-    return 1;
-}
-
 static void Convert2FullMatrix()
 {
     int n = DimensionSaved, i, j;
     Node *Ni, *Nj;
-    
+
     if (Scale < 1)
         Scale = 1;
     if (n > MaxMatrixDimension) {
@@ -2131,5 +2166,3 @@ static void Convert2FullMatrix()
     Distance = Distance_ATSP;
     WeightType = -1;
 }
-
-

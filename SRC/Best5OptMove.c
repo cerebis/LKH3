@@ -9,7 +9,7 @@
  * To prevent an infinity chain of moves the last edge in a 5-opt move must
  * not previously have been included in the chain.
 
- * The edge (t1,t2) is the first edge to be exchanged.  G0 is a pointer to the
+ * The edge (t1,t2) is the first edge to be exchanged. G0 is a pointer to the
  * accumulated gain.
 
  * In case a r-opt move is found that improves the tour, the improvement of

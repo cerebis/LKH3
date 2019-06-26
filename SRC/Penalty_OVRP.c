@@ -7,7 +7,7 @@ GainType Penalty_OVRP()
     Node *N, *NextN, *CurrentRoute;
     GainType DemandSum, DistanceSum, P = 0;
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
-    
+
     if (!StartRoute)
         StartRoute = Depot;
     if (StartRoute->Id > DimensionSaved)
@@ -40,9 +40,9 @@ GainType Penalty_OVRP()
         if (DistanceSum > DistanceLimit &&
             ((P += DistanceSum - DistanceLimit) > CurrentPenalty ||
              (P == CurrentPenalty && CurrentGain <= 0))) {
-                StartRoute = CurrentRoute;
-                return CurrentPenalty + (CurrentGain > 0);
-            }
+            StartRoute = CurrentRoute;
+            return CurrentPenalty + (CurrentGain > 0);
+        }
     } while (N != StartRoute);
     return P;
 }

@@ -26,6 +26,7 @@ void PrintParameters()
             CandidateSetType == ALPHA ? "ALPHA" :
             CandidateSetType == DELAUNAY ? "DELAUNAY" :
             CandidateSetType == NN ? "NEAREST-NEIGHBOR" :
+            CandidateSetType == POPMUSIC ? "POPMUSIC" :
             CandidateSetType == QUADRANT ? "QUADRANT" : "",
             DelaunayPure ? " PURE" : "");
     if (Salesmen > 1)
@@ -63,7 +64,7 @@ void PrintParameters()
             InitialTourAlgorithm == NEAREST_NEIGHBOR ? "NEAREST-NEIGHBOR" :
             InitialTourAlgorithm ==
             QUICK_BORUVKA ? "QUICK-BORUVKA" :
-            InitialTourAlgorithm == SIERPINSKI ? "SIERPINSKI" : 
+            InitialTourAlgorithm == SIERPINSKI ? "SIERPINSKI" :
             InitialTourAlgorithm == SOP_ALG ? "SOP" :
             InitialTourAlgorithm == TSPDL_ALG ? "TSPDL" : "WALK");
     printff("%sINITIAL_TOUR_FILE = %s\n",
@@ -73,8 +74,8 @@ void PrintParameters()
     printff("%sINPUT_TOUR_FILE = %s\n",
             InputTourFileName ? "" : "# ",
             InputTourFileName ? InputTourFileName : "");
-    printff("KICKS = %d\n", Kicks);
     printff("KICK_TYPE = %d\n", KickType);
+    printff("KICKS = %d\n", Kicks);
     if (MaxBreadth == INT_MAX)
         printff("# MAX_BREADTH =\n");
     else
@@ -131,6 +132,12 @@ void PrintParameters()
             PatchingCExtended ? "EXTENDED" : "");
     printff("%sPI_FILE = %s\n",
             PiFileName ? "" : "# ", PiFileName ? PiFileName : "");
+    printff("POPMUSIC_INITIAL_TOUR = %s\n",
+            POPMUSIC_InitialTour ? "YES" : "NO");
+    printff("POPMUSIC_MAX_NEIGHBORS = %d\n", POPMUSIC_MaxNeighbors);
+    printff("POPMUSIC_SAMPLE_SIZE = %d\n", POPMUSIC_SampleSize);
+    printff("POPMUSIC_SOLUTIONS = %d\n", POPMUSIC_Solutions);
+    printff("POPMUSIC_TRIALS = %d\n", POPMUSIC_Trials);
     if (MaxPopulationSize == 0)
         printff("# ");
     printff("POPULATION_SIZE = %d\n", MaxPopulationSize);
@@ -139,8 +146,7 @@ void PrintParameters()
             ProblemFileName ? "" : "# ",
             ProblemFileName ? ProblemFileName : "");
     printff("RECOMBINATION = %s\n", Recombination == IPT ? "IPT" :
-            Recombination == GPX2 ? "GPX2" :
-            "UNKNOWN");
+            Recombination == GPX2 ? "GPX2" : "UNKNOWN");
     printff("RESTRICTED_SEARCH = %s\n", RestrictedSearch ? "YES" : "NO");
     printff("RUNS = %d\n", Runs);
     printff("SALESMEN = %d\n", Salesmen);

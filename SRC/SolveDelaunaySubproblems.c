@@ -110,8 +110,8 @@ static int DelaunayClustering(int MaxClusterSize)
         do {
             v = Other_point(e, u);
             if (u->id < v->id) {
-                EdgeSet[j].From = From = &NodeSet[u->id];;
-                EdgeSet[j].To = To = &NodeSet[v->id];;
+                EdgeSet[j].From = From = &NodeSet[u->id];
+                EdgeSet[j].To = To = &NodeSet[v->id];
                 EdgeSet[j++].Cost = FixedOrCommon(From, To) ? INT_MIN :
                     Distance(From, To) * Precision + From->Pi + To->Pi;
             }

@@ -10,11 +10,11 @@
  * to the current tree). 
  */
 
-int HeapCount;                  /* Its current number of elements */
+static int HeapCount;           /* Its current number of elements */
 static int HeapCapacity;        /* Its capacity */
 
 /*      
- * The HeapMake function creates an empty heap. 
+ * The HeapMake function creates an empty heap.
  */
 
 void HeapMake(int Size)

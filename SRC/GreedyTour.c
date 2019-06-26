@@ -31,9 +31,9 @@
  * heuristic is used. 
  */
 
-#define Degree V                /* Number of edges currently adjacent to a node */
-#define Mark LastV              /* Mark of a node during breadth-first search   */
-#define Level BestPi            /* Search level */
+#define Degree V        /* Number of edges currently adjacent to a node */
+#define Mark LastV      /* Mark of a node during breadth-first search   */
+#define Level BestPi    /* Search level */
 
 static Node *NearestNeighbor(Node * From);
 static Node *NearestInList(Node * From, Node * First);

@@ -18,27 +18,27 @@
  *
  * Additional control information may be supplied in the following format:
  *
- * ASCENT_CANDIDATES  = <integer>
+ * ASCENT_CANDIDATES = <integer>
  * The number of candidate edges to be associated with each node during the
- * ascent. The candi¬date set is complemented such that every candidate edge
+ * ascent. The candidate set is complemented such that every candidate edge
  * is associated with both its two end nodes.
- * Default: 50.
+ * Default: 50
  *
  * BACKBONE_TRIALS = <integer>
  * The number of backbone trials in each run.
- * Default: 0.
+ * Default: 0
  *
  * BACKTRACKING = { YES | NO }
- * Specifies whether a backtracking k-opt move is to be used as the first move
- * in a se¬quence of moves (where k = MOVE_TYPE).
- * Default: 0.
+ * Specifies whether a backtracking k-opt move is to be used as the first
+ * move in a sequence of moves (where k = MOVE_TYPE).
+ * Default: NO
  *
  * BWTSP = <integer> <integer> [ <integer> ]
  * Specifies the three parameters (B, Q, L) to a BWTSP instance.
  *   B: Number of black nodes.
  *   Q: Maximum number of white nodes on "black-to-black" paths.
  *   L: Maximum length of any "black-to-black" path.
- * Default: 0 0.
+ * Default: 0 0
  *
  * CANDIDATE_FILE = <string>
  * Specifies the name of a file to which the candidate sets are to be written.
@@ -48,20 +48,20 @@
  * Each of the following lines contains a node number, the number of
  * the dad of the node in the minimum spanning tree (0, if the node has no dad),
  * the number of candidate edges emanating from the node, followed by the
- * candidate edges. For each candidate edge its end node number and alpha-value
- * are given.
+ * candidate edges.
+ * For each candidate edge its end node number and alpha-value are given.
  * It is possible to give more than one CANDIDATE_FILE specification. In this
  * case the given files are read and the union of their candidate edges is
  * used as candidate sets.
  *
  * CANDIDATE_SET_TYPE = { ALPHA | DELAUNAY [ PURE ] | NEAREST-NEIGHBOR |
- *                        QUADRANT }
+ *                        POPMUSIC | QUADRANT }
  * Specifies the candidate set type.
  * ALPHA is LKH's default type. It is applicable in general.
- * The other four types can only be used for instances given by coordinates.
+ * The other types can only be used for instances given by coordinates.
  * The optional suffix PURE for the DELAUNAY type specifies that only
  * edges of the Delaunay graph are used as candidates.
- * Default: ALPHA.
+ * Default: ALPHA
  *
  * COMMENT <string>
  * A comment.
@@ -91,7 +91,7 @@
  * The maximum alpha-value allowed for any candidate edge is set to
  * EXCESS times the absolute value of the lower bound of a solution
  * tour (determined by the ascent).
- * Default: 1.0/DIMENSION.
+ * Default: 1.0/DIMENSION
  *
  * EXTRA_CANDIDATES = <integer> [ SYMMETRIC ]
  * Number of extra candidate edges to be added to the candidate set
@@ -108,24 +108,24 @@
  *
  * GAIN23 = { YES | NO }
  * Specifies whether the Gain23 function is used.
- * Default: YES.
+ * Default: YES
  *
  * GAIN_CRITERION = { YES | NO }
  * Specifies whether Lin and Kernighan's gain criterion is used.
- * Default: YES.
+ * Default: YES
  *
  * INITIAL_PERIOD = <integer>
  * The length of the first period in the ascent.
- * Default: DIMENSION/2 (but at least 100).
+ * Default: DIMENSION/2 (but at least 100)
  *
  * INITIAL_STEP_SIZE = <integer>
  * The initial step size used in the ascent.
- * Default: 1.
+ * Default: 1
  *
  * INITIAL_TOUR_ALGORITHM = { BORUVKA | CVRP | GREEDY | MOORE | MTSP |
  *       NEAREST-NEIGHBOR | QUICK-BORUVKA | SIERPINSKI | SOP | TSPDL | WALK }
  * Specifies the algorithm for obtaining an initial tour.
- * Default: WALK.
+ * Default: WALK
  *
  * INITIAL_TOUR_FILE = <string>
  * Specifies the name of a file containing a tour to be used as the
@@ -151,22 +151,22 @@
  * Specifies the value of k for a random k-swap kick (an extension of the
  * double-bridge move). If KICK_TYPE is zero, then the LKH's special kicking
  * strategy, WALK, is used.
- * Default: 0.
+ * Default: 0
  *
  * KICKS = <integer>
  * Specifies the number of times to "kick" a tour found by Lin-Kernighan.
- * Each kick is a random k-swap-kick move. However, if KICKS is zero, then
+ * Each kick is a random k-swap kick-move. However, if KICKS is zero, then
  * LKH's special kicking strategy, WALK, is used.
- * Default: 1.
+ * Default: 1
  *
  * MAKESPAN = { YES | NO }
  * Specifies if makespan optimization is to be used for a TSPTW instance.
- * Default: NO.
+ * Default: NO
  *
  * MAX_BREADTH = <integer>
  * The maximum number of candidate edges considered at each level of
  * the search for a move.
- * Default: INT_MAX.
+ * Default: INT_MAX
  *
  * MAX_CANDIDATES = <integer> [ SYMMETRIC ]
  * The maximum number of candidate edges to be associated with each node.
@@ -176,16 +176,16 @@
  * If MAX_CANDIDATES is zero the candidate sets are made up of the
  * edges represented in the CANDIDATE_FILEs, the INITIAL_TOUR_FILE,
  * the INPUT_TOUR_FILE, the SUBPROBLEM_TOUR_FILE, and the MERGE_TOUR_FILEs.
- * Default: 5.
+ * Default: 5
  *
  * MAX_SWAPS = <integer>
  * Specifies the maximum number of swaps (flips) allowed in any search
  * for a tour improvement.
- * Default: DIMENSION.
+ * Default: DIMENSION
  *
  * MAX_TRIALS = <integer>
  * The maximum number of trials in each run.
- * Default: number of nodes (DIMENSION, given in the problem file).
+ * Default: DIMENSION
  *
  * MERGE_TOUR_FILE = <string>
  * Specifies the name of a tour to be merged. The edges of the tour are
@@ -193,11 +193,11 @@
  * It is possible to give more than two MERGE_TOUR_FILE specifications.
  *
  * MOVE_TYPE = <integer> [ SPECIAL ]
- * Specifies the move type to be used in local search.
+ * Specifies the move type to be used in as submove in Lin-Kernighan.
  * An integer value k >= 2 signifies that a sequential k-opt move is to be used.
  * The specifier SPECIAL can be given in order to use LKH-3’s specially
  * designed moves. For this type of moves, k must be 3 or 5.
- * Default: 5.
+ * Default: 5
  *
  * MTSP_MIN_SIZE = <integer>
  * Specifies the minimum number of cities each salesman must visit in an
@@ -230,7 +230,7 @@
  * signifies that attempts are made to improve a tour by nonsequential
  * k-opt moves where 4 <= k <= K. Note, however, that the effect depends
  * on the specifications of PATCHING_C and PATCHING_A.
- * Default: value of (MOVE_TYPE + PATCHING_C + PATCHING_A - 1).
+ * Default: (MOVE_TYPE + PATCHING_C + PATCHING_A - 1)
  *
  * OUTPUT_TOUR_FILE = <string>
  * Specifies the name of a file where the best tour is to be written.
@@ -242,7 +242,7 @@
  * OPTIMUM = <integer>
  * Known optimal tour length. If STOP_AT_OPTIMUM is YES, a run will be
  * terminated if the tour length becomes equal to this value.
- * Default: MINUS_INFINITY.
+ * Default: MINUS_INFINITY
  *
  * PATCHING_A = <integer> [ RESTRICTED | EXTENDED ]
  * The maximum number of disjoint alternating cycles to be used for
@@ -253,7 +253,7 @@
  * considered if all its inclusion edges are candidate edges.
  * The keyword EXTENDED signifies that the non-sequential move need
  * not be gainful if only all its inclusion edges are candidate edges.
- * Default: 1.
+ * Default: 1
  *
  * PATCHING_C = <integer> [ RESTRICTED | EXTENDED ]
  * The maximum number of disjoint cycles to be patched in an attempt
@@ -264,7 +264,7 @@
  * considered if all its inclusion edges are candidate edges.
  * The keyword EXTENDED signifies that the non-sequential move need
  * not be gainful if only all its inclusion edges are candidate edges.
- * Default: 0.
+ * Default: 0
  *
  * PI_FILE = <string>
  * Specifies the name of a file to which penalties (Pi-values determined
@@ -277,15 +277,39 @@
  * the Pi-value associated with the node.
  * The file name "0" represents a file with all Pi-values equal to zero.
  *
+ * POPMUSIC_INITIAL_TOUR = { YES | NO }
+ * Specifies whether the best POPMUSIC tour is to be used as intial tour
+ * for Lin-Kernighan.
+ * Default: NO
+ *
+ * POPMUSIC_MAX_NEIGHBORS = <int>
+ * Maximum number of nearest neighbors used as candidates in 3-opt for
+ * POPMUSIC.
+ * Default: 5
+ * 
+ * POPMUSIC_SAMPLE_SIZE = <int>
+ * Sample size.
+ * Default: 10
+ *
+ * POPMUSIC_SOLUTIONS = <int>
+ * Number of solutions to be generated.
+ * Default: 50
+ *
+ * POPMUSIC_TRIALS = <int>
+ * Number of trials used in iterated 3-opt for POPMUSIC.
+ * If the value is zero, the number of trials is the size of the subpath
+ * to be optimized.
+ * Default: 1
+ *
  * POPULATION_SIZE = <integer>
  * Specifies the maximum size of the population in the genetic algorithm.
- * Default: 0.
+ * Default: 0
  *
  * PRECISION = <integer>
  * The internal precision in the representation of transformed distances:
  *    d[i][j] = PRECISION*c[i][j] + pi[i] + pi[j],
  * where d[i][j], c[i][j], pi[i] and pi[j] are all integral.
- * Default: 100 (which corresponds to 2 decimal places).
+ * Default: 100 (which corresponds to 2 decimal places)
  *
  * RECOMBINATION = { IPT | GPX2 }
  * Default: IPT
@@ -295,24 +319,24 @@
  * The first edge to be broken in a move must not belong to the currently
  * best solution tour. When no solution tour is known, it must not belong
  * to the minimum spanning 1-tree.
- * Default: YES.
+ * Default: YES
  *
  * RUNS = <integer>
  * The total number of runs.
- * Default: 10.
+ * Default: 10
  *
  * SALESMEN = <integer>
  * Specifies the number of salesmen/vehicles.
- * Default: 1.
+ * Default: 1
  *
  * SCALE = <integer>
  * Scale factor for Euclidean and ATT instances.
- * Default: 1.
+ * Default: 1
  *
  * SEED = <integer>
  * Specifies the initial seed for random number generation. If zero, the
  * seed is derived from the system clock.
- * Default: 1.
+ * Default: 1
  *
  * SINTEF_SOLUTION_FILE = <string>
  * Specifies the name of a file where the solution of an MTSP or VRP instance
@@ -333,12 +357,12 @@
  * STOP_AT_OPTIMUM = { YES | NO }
  * Specifies whether a run is stopped, if the tour length becomes equal
  * to OPTIMUM.
- * Default: YES.
+ * Default: YES
  *
  * SUBGRADIENT = { YES | NO }
  * Specifies whether the Pi-values should be determined by subgradient
  * optimization.
- * Default: YES.
+ * Default: YES
  *
  * SUBPROBLEM_SIZE = <integer> [ DELAUNAY | KARP | K-CENTER | K-MEANS | MOORE |
  *                               ROHE | SIERPINSKI ] [ BORDERS ] [ COMPRESSED ]
@@ -351,7 +375,7 @@
  * the Delaunay partitioning scheme is used, KARP that Karp's partitioning
  * scheme is used, K-CENTER that a partitioning scheme based on K-center
  * clustering, K-MEANS that a partitioning scheme based on K-means clustering
- * is used, ROHE that Rohe's random rectangle/cube partitining scheme is used,
+ * is used, ROHE that Rohe's random rectangle/cube partitioning scheme is used,
  * and MOORE or SIERPINSKI that a partitioning scheme based on either a Moore
  * or Sierpinski space-filling curve is used.
  * The BORDERS specification signifies that the subproblems along the borders
@@ -360,7 +384,7 @@
  * removing from the problem all nodes with two incident subproblem tour edges
  * that belong to all tours to be merged (at least two MERGE_TOUR_FILEs should
  * be given).
- * Default: 0.
+ * Default: 0
  *
  * SUBPROBLEM_TOUR_FILE = <string>
  * Specifies the name of a file containing a tour to be used for dividing
@@ -376,16 +400,16 @@
  * (K = MOVE_TYPE).
  * The specifier SPECIAL can be given in order to use LKH-3’s specially
  * designed moves. For this type of moves, k must be 3 or 5.
- * Default: 0.
+ * Default: 0
  *
  * SUBSEQUENT_PATCHING = { YES | NO }
  * Specifies whether patching is used for moves following the first move
  * in a sequence of moves.
- * Default: YES.
+ * Default: YES
  *
  * TIME_LIMIT = <real>
  * Specifies a time limit in seconds for each run.
- * Default: DBL_MAX.
+ * Default: DBL_MAX
  *
  * TOUR_FILE = <string>
  * Specifies the name of a file where the best tour is to be written.
@@ -397,7 +421,7 @@
  * Specifies the level of detail of the output given during the solution
  * process. The value 0 signifies a minimum amount of output. The higher
  * the value is the more information is given.
- * Default: 1.
+ * Default: 1
  *
  * VEHICLES = <integer>
  * Specifies the number of vehicles/salesmen.
@@ -425,6 +449,7 @@
  *     MTSP              MT
  *     NEAREST-NEIGHBOR  N
  *     NO                N
+ *     POPMUSIC          P
  *     PURE              P
  *     QUADRANT          Q
  *     QUICK-BORUVKA     Q
@@ -502,6 +527,11 @@ void ReadParameters()
     PatchingCExtended = 0;
     PatchingCRestricted = 0;
     Precision = 100;
+    POPMUSIC_InitialTour = 0;
+    POPMUSIC_MaxNeighbors = 5;
+    POPMUSIC_SampleSize = 10;
+    POPMUSIC_Solutions = 50;
+    POPMUSIC_Trials = 1;
     Recombination = IPT;
     RestrictedSearch = 1;
     RohePartitioning = 0;
@@ -603,21 +633,23 @@ void ReadParameters()
             if (!(Token = strtok(0, Delimiters)))
                 eprintf("%s", "CANDIDATE_SET_TYPE: "
                         "ALPHA, DELAUNAY, NEAREST-NEIGHBOR, "
-                        "or QUADRANT expected");
+                        "POPMUSIC or QUADRANT expected");
             for (i = 0; i < strlen(Token); i++)
                 Token[i] = (char) toupper(Token[i]);
             if (!strncmp(Token, "ALPHA", strlen(Token)))
                 CandidateSetType = ALPHA;
-            else if (!strncmp(Token, "DELAUNAY", strlen(Token))) {
+            else if (!strncmp(Token, "DELAUNAY", strlen(Token)))
                 CandidateSetType = DELAUNAY;
-            } else if (!strncmp(Token, "NEAREST-NEIGHBOR", strlen(Token)))
+            else if (!strncmp(Token, "NEAREST-NEIGHBOR", strlen(Token)))
                 CandidateSetType = NN;
+            else if (!strncmp(Token, "POPMUSIC", strlen(Token)))
+                CandidateSetType = POPMUSIC;
             else if (!strncmp(Token, "QUADRANT", strlen(Token)))
                 CandidateSetType = QUADRANT;
             else
                 eprintf("%s", "CANDIDATE_SET_TYPE: "
                         "ALPHA, DELAUNAY, NEAREST-NEIGHBOR, "
-                        "or QUADRANT expected");
+                        "POPMUSIC, or QUADRANT expected");
             if (CandidateSetType == DELAUNAY) {
                 if ((Token = strtok(0, Delimiters))) {
                     for (i = 0; i < strlen(Token); i++)
@@ -628,36 +660,16 @@ void ReadParameters()
                     DelaunayPure = 1;
                 }
             }
-        } else if (!strcmp(Keyword, "COMMENT"))
+        } else if (!strcmp(Keyword, "COMMENT")) {
             continue;
-        else if (!strcmp(Keyword, "DEPOT")) {
+        } else if (!strcmp(Keyword, "DEPOT")) {
             if (!(Token = strtok(0, Delimiters)) ||
                 !sscanf(Token, "%d", &MTSPDepot))
                 eprintf("DEPOT: integer expected");
             if (MTSPDepot <= 0)
                 eprintf("DEPOT: positive integer expected");
-        } else if (!strcmp(Keyword, "EOF"))
+        } else if (!strcmp(Keyword, "EOF")) {
             break;
-        else if (!strcmp(Keyword, "EXCESS")) {
-            if (!(Token = strtok(0, Delimiters)) ||
-                !sscanf(Token, "%lf", &Excess))
-                eprintf("EXCESS: real expected");
-            if (Excess < 0)
-                eprintf("EXCESS: non-negeative real expected");
-        } else if (!strcmp(Keyword, "EXTRA_CANDIDATES")) {
-            if (!(Token = strtok(0, Delimiters)) ||
-                !sscanf(Token, "%d", &ExtraCandidates))
-                eprintf("EXTRA_CANDIDATES: integer expected");
-            if (ExtraCandidates < 0)
-                eprintf("EXTRA_CANDIDATES: non-negative integer expected");
-            if ((Token = strtok(0, Delimiters))) {
-                for (i = 0; i < strlen(Token); i++)
-                    Token[i] = (char) toupper(Token[i]);
-                if (strncmp(Token, "SYMMETRIC", strlen(Token)))
-                    eprintf
-                        ("(EXTRA_CANDIDATES) Illegal SYMMETRIC specification");
-                ExtraCandidateSetSymmetric = 1;
-            }
         } else if (!strcmp(Keyword, "EDGE_FILE")) {
             if (!(Name = GetFileName(0)))
                 eprintf("EDGE_FILE: string expected");
@@ -676,6 +688,26 @@ void ReadParameters()
                                               1) * sizeof(char *)));
                     EdgeFileName[EdgeFiles++] = Name;
                 }
+            }
+        } else if (!strcmp(Keyword, "EXCESS")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%lf", &Excess))
+                eprintf("EXCESS: real expected");
+            if (Excess < 0)
+                eprintf("EXCESS: non-negeative real expected");
+        } else if (!strcmp(Keyword, "EXTRA_CANDIDATES")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%d", &ExtraCandidates))
+                eprintf("EXTRA_CANDIDATES: integer expected");
+            if (ExtraCandidates < 0)
+                eprintf("EXTRA_CANDIDATES: non-negative integer expected");
+            if ((Token = strtok(0, Delimiters))) {
+                for (i = 0; i < strlen(Token); i++)
+                    Token[i] = (char) toupper(Token[i]);
+                if (strncmp(Token, "SYMMETRIC", strlen(Token)))
+                    eprintf
+                        ("(EXTRA_CANDIDATES) Illegal SYMMETRIC specification");
+                ExtraCandidateSetSymmetric = 1;
             }
         } else if (!strcmp(Keyword, "EXTRA_CANDIDATE_SET_TYPE")) {
             if (!(Token = strtok(0, Delimiters)))
@@ -766,7 +798,7 @@ void ReadParameters()
                 !sscanf(Token, "%d", &Kicks))
                 eprintf("KICKS: integer expected");
             if (Kicks < 0)
-                eprintf("KICKS: non-neEgative integer expected");
+                eprintf("KICKS: non-negative integer expected");
         } else if (!strcmp(Keyword, "MAKESPAN")) {
             if (!ReadYesOrNo(&TSPTW_Makespan))
                 eprintf("MAKESPAN: YES or NO expected");
@@ -921,6 +953,34 @@ void ReadParameters()
         } else if (!strcmp(Keyword, "PI_FILE")) {
             if (!(PiFileName = GetFileName(0)))
                 eprintf("PI_FILE: string expected");
+        } else if (!strcmp(Keyword, "POPMUSIC_INITIAL_TOUR")) {
+            if (!ReadYesOrNo(&POPMUSIC_InitialTour))
+                eprintf("POPMUSIC_INITIAL_TOUR: YES or NO expected");
+        } else if (!strcmp(Keyword, "POPMUSIC_MAX_NEIGHBORS")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%d", &POPMUSIC_MaxNeighbors))
+                eprintf("POPMUSIC_MAX_NEIGHBORS: integer expected");
+            if (POPMUSIC_MaxNeighbors <= 0)
+                eprintf
+                    ("POPMUSIC_MAX_NEIGHBORS: positive integer expected");
+        } else if (!strcmp(Keyword, "POPMUSIC_SAMPLE_SIZE")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%d", &POPMUSIC_SampleSize))
+                eprintf("POPMUSIC_SAMPLE_SIZE: integer expected");
+            if (POPMUSIC_SampleSize <= 0)
+                eprintf("POPMUSIC_SAMPLE_SIZE: positive integer expected");
+        } else if (!strcmp(Keyword, "POPMUSIC_SOLUTIONS")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%d", &POPMUSIC_Solutions))
+                eprintf("POPMUSIC_SOLUTIONS: integer expected");
+            if (POPMUSIC_Solutions <= 0)
+                eprintf("POPMUSIC_SOLUTIONS: positive integer expected");
+        } else if (!strcmp(Keyword, "POPMUSIC_TRIALS")) {
+            if (!(Token = strtok(0, Delimiters)) ||
+                !sscanf(Token, "%d", &POPMUSIC_Trials))
+                eprintf("POPMUSIC_TRIALS: integer expected");
+            if (POPMUSIC_Trials < 0)
+                eprintf("POPMUSIC_TRIALS: non-negative integer expected");
         } else if (!strcmp(Keyword, "POPULATION_SIZE")) {
             if (!(Token = strtok(0, Delimiters)) ||
                 !sscanf(Token, "%d", &MaxPopulationSize))
@@ -1088,8 +1148,7 @@ static char *GetFileName(char *Line)
     if (!Rest)
         return 0;
     while (isspace(*Rest))
-        while (isspace(*Rest))
-            Rest++;
+        Rest++;
     if (!Line) {
         if (*Rest == '=')
             Rest++;

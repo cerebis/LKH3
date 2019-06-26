@@ -10,10 +10,6 @@
 int IsCommonEdge(const Node * ta, const Node * tb)
 {
     int i;
-    if (0)
-        if (ta->Id != 1 && tb->Id != 1 && ta->Id <= Dim && tb->Id <= Dim &&
-            InInitialTour(ta, tb))
-            return 1;
 
     if (MergeTourFiles < 2)
         return 0;

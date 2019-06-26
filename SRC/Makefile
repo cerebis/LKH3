@@ -21,7 +21,8 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        BridgeGain.o BuildKDTree.o C.o CandidateReport.o                \
        ChooseInitialTour.o Connect.o CreateCandidateSet.o              \
        CreateDelaunayCandidateSet.o CreateNNCandidateSet.o             \
-       CreateQuadrantCandidateSet.o CVRP_InitialTour.o Delaunay.o      \
+       Create_POPMUSIC_CandidateSet.o CreateQuadrantCandidateSet.o     \
+	   CVRP_InitialTour.o Delaunay.o                                   \
        Distance.o Distance_MTSP.o Distance_SOP.o Distance_SPECIAL.o    \
        eprintf.o ERXT.o Excludable.o Exclude.o FindTour.o              \
        FixedOrCommonCandidates.o Flip.o Flip_SL.o Flip_SSL.o           \

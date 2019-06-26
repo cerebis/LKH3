@@ -45,9 +45,10 @@ GainType LinKernighan()
     FirstActive = LastActive = 0;
     Swaps = 0;
 
-    /* Compute the cost of the initial tour, Cost. Compute the
-       corresponding hash value, Hash. Initialize the segment list. Make
-       all nodes "active" (so that they can be used as t1). */
+    /* Compute the cost of the initial tour, Cost.
+       Compute the corresponding hash value, Hash.
+       Initialize the segment list.
+       Make all nodes "active" (so that they can be used as t1). */
 
     Cost = 0;
     Hash = 0;
@@ -130,11 +131,11 @@ GainType LinKernighan()
                 while (t2);
                 if (PenaltyGain > 0 || Gain > 0) {
                     /* An improvement has been found */
-                    #ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG
                     assert(Gain % Precision == 0);
-                    #else
+#else
                     assert(fmod(Gain, Precision) == 0);
-                    #endif
+#endif
                     Cost -= Gain / Precision;
                     CurrentPenalty -= PenaltyGain;
                     StoreTour();
@@ -165,11 +166,11 @@ GainType LinKernighan()
         PenaltyGain = 0;
         if (Gain23Used && ((Gain = Gain23()) > 0 || PenaltyGain > 0)) {
             /* An improvement has been found */
-            #ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG
             assert(Gain % Precision == 0);
-            #else
+#else
             assert(fmod(Gain, Precision) == 0);
-            #endif
+#endif
             Cost -= Gain / Precision;
             CurrentPenalty -= PenaltyGain;
             TSPTW_CurrentMakespanCost = Cost;
