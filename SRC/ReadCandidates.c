@@ -24,14 +24,12 @@ int ReadCandidates(int MaxCandidates)
 {
     FILE *CandidateFile = 0;
     Node *From, *To;
-    int Dimension, i, f, Id, Alpha, Count;
+    int i, f, Id, Alpha, Count;
 
     if (CandidateFiles == 0 ||
         (CandidateFiles == 1 &&
          !(CandidateFile = fopen(CandidateFileName[0], "r"))))
         return 0;
-    Dimension = ProblemType != ATSP || ProblemType != SOP || Salesmen > 1 ?
-        DimensionSaved : 2 * DimensionSaved;
     for (f = 0; f < CandidateFiles; f++) {
         if (CandidateFiles >= 2 &&
             !(CandidateFile = fopen(CandidateFileName[f], "r")))

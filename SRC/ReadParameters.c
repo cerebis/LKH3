@@ -112,7 +112,7 @@
  * Default: 1.
  *
  * INITIAL_TOUR_ALGORITHM = { BORUVKA | CVRP | GREEDY | MOORE | MTSP |
- *       NEAREST-NEIGHBOR | QUICK-BORUVKA | SIERPINSKI | SOP | WALK }
+ *       NEAREST-NEIGHBOR | QUICK-BORUVKA | SIERPINSKI | SOP | TSPDL | WALK }
  * Specifies the algorithm for obtaining an initial tour.
  * Default: WALK.
  *
@@ -420,6 +420,7 @@
  *     SOP               SO
  *     SPECIAL           S
  *     SYMMETRIC         S
+ *     TSPDL             T
  *     WALK              W
  *     YES               Y
  */
@@ -678,7 +679,7 @@ void ReadParameters()
                 eprintf("INITIAL_TOUR_ALGORITHM: "
                         "BORUVKA, CVRP, GREEDY, MOORE, MTSP,\n"
                         "NEAREST-NEIGHBOR, QUICK-BORUVKA, SIERPINSKI, "
-                        "SOP, or WALK expected");
+                        "SOP, TSPDL, or WALK expected");
             for (i = 0; i < strlen(Token); i++)
                 Token[i] = (char) toupper(Token[i]);
             if (!strncmp(Token, "BORUVKA", strlen(Token)))
@@ -699,13 +700,15 @@ void ReadParameters()
                 InitialTourAlgorithm = SIERPINSKI;
             else if (!strncmp(Token, "SOP", max(strlen(Token), 2)))
                 InitialTourAlgorithm = SOP_ALG;
+            else if (!strncmp(Token, "TSPDL", strlen(Token)))
+                InitialTourAlgorithm = TSPDL_ALG;
             else if (!strncmp(Token, "WALK", strlen(Token)))
                 InitialTourAlgorithm = WALK;
             else
                 eprintf("INITIAL_TOUR_ALGORITHM: "
                         "BORUVKA, CVRP, GREEDY, MOORE, MTSP,\n"
                         "NEAREST-NEIGHBOR, QUICK-BORUVKA, SIERPINSKI, "
-                        "SOP, or WALK expected");
+                        "SOP, TSPDL, or WALK expected");
         } else if (!strcmp(Keyword, "INITIAL_TOUR_FILE")) {
             if (!(InitialTourFileName = GetFileName(0)))
                 eprintf("INITIAL_TOUR_FILE: string expected");

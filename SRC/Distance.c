@@ -15,6 +15,17 @@ int Distance_LARGE(Node * Na, Node * Nb)
     return 10000000;
 }
 
+int Distance_Asymmetric(Node * Na, Node * Nb)
+{
+    int n = DimensionSaved;
+    if ((Na->Id <= n) == (Nb->Id <= n))
+        return M;
+    if (abs(Na->Id - Nb->Id) == n)
+        return 0;
+    return Na->Id <= n ? OldDistance(Na, Nb - n) :
+                         OldDistance(Nb, Na - n);
+}
+
 int Distance_ATSP(Node * Na, Node * Nb)
 {
     int n = DimensionSaved;

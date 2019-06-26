@@ -44,13 +44,15 @@ void ChooseInitialTour()
     }
     if (Trial == 1 && (!FirstNode->InitialSuc || InitialTourFraction < 1)) {
         if (InitialTourAlgorithm == BORUVKA ||
+            InitialTourAlgorithm == CVRP_ALG ||
             InitialTourAlgorithm == GREEDY ||
             InitialTourAlgorithm == MOORE ||
             InitialTourAlgorithm == MTSP_ALG ||
             InitialTourAlgorithm == NEAREST_NEIGHBOR ||
             InitialTourAlgorithm == QUICK_BORUVKA ||
             InitialTourAlgorithm == SIERPINSKI ||
-            InitialTourAlgorithm == SOP_ALG) {
+            InitialTourAlgorithm == SOP_ALG ||
+            InitialTourAlgorithm == TSPDL_ALG) {
             GainType Cost = InitialTourAlgorithm == MOORE ||
                 InitialTourAlgorithm == SIERPINSKI ?
                 SFCTour(InitialTourAlgorithm) :
@@ -59,7 +61,9 @@ void ChooseInitialTour()
                 InitialTourAlgorithm == MTSP_ALG ?
                 MTSP_InitialTour() :
                 InitialTourAlgorithm == SOP_ALG ?
-                SOP_InitialTour() : GreedyTour();
+                SOP_InitialTour() : 
+                InitialTourAlgorithm == TSPDL_ALG ?
+                TSPDL_InitialTour() : GreedyTour();
             if (MaxTrials == 0) {
                 BetterCost = Cost;
                 RecordBetterTour();

@@ -66,7 +66,7 @@ void delaunay(int n)
     edge *l_cw, *r_ccw;
     point **p_sorted;
     Node *N = FirstNode;
-    int i, j;
+    int Duplicates = 0,i, j;
 
     alloc_memory(n);
     for (i = 0; i < n; i++) {
@@ -89,12 +89,15 @@ void delaunay(int n)
                 (float) p_sorted[j]->y != (float) p_sorted[i]->y)
                 break;
         for (j--; i < j; i++) {
+            Duplicates++;
             p_sorted[i + 1]->x =
                 nextafterf((float) p_sorted[i]->x, FLT_MAX);
             p_sorted[i + 1]->y =
                 nextafterf((float) p_sorted[i]->y, FLT_MAX);
         }
     }
+    if (Duplicates > 0)
+        qsort(p_sorted, n, sizeof(point *), compare);
 
     divide(p_sorted, 0, n - 1, &l_cw, &r_ccw);
     free(p_sorted);

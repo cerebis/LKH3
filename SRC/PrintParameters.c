@@ -58,8 +58,9 @@ void PrintParameters()
             InitialTourAlgorithm == NEAREST_NEIGHBOR ? "NEAREST-NEIGHBOR" :
             InitialTourAlgorithm ==
             QUICK_BORUVKA ? "QUICK-BORUVKA" :
+            InitialTourAlgorithm == SIERPINSKI ? "SIERPINSKI" : 
             InitialTourAlgorithm == SOP_ALG ? "SOP" :
-            InitialTourAlgorithm == SIERPINSKI ? "SIERPINSKI" : "WALK");
+            InitialTourAlgorithm == TSPDL_ALG ? "TSPDL" : "WALK");
     printff("%sINITIAL_TOUR_FILE = %s\n",
             InitialTourFileName ? "" : "# ",
             InitialTourFileName ? InitialTourFileName : "");

@@ -1,20 +1,25 @@
 #include "LKH.h"
 
-void SINTEF_WriteSolution(char *FileName)
+void SINTEF_WriteSolution(char *FileName, GainType Cost)
 {
     FILE *ResultFile;
     Node *N, *NextN;
+    char *FullFileName;
     int Route, Forward;
-
+    time_t Now;
+    
     if (FileName == 0)
         return;
+    FullFileName = FullName(FileName, Cost);
+    Now = time(&Now);
     if (TraceLevel >= 1)
-        printff("Writing MTSP_SINTEF_RESULT_FILE: \"%s\" ... ", FileName);
-    assert(ResultFile = fopen(FileName, "w"));
+        printff("Writing MTSP_SINTEF_SOLUTION_FILE: \"%s\" ... ", FullFileName);
+    assert(ResultFile = fopen(FullFileName, "w"));
     fprintf(ResultFile, "Instance name : %s\n", Name);
     fprintf(ResultFile, "Authors       : Keld Helsgaun\n");
-    fprintf(ResultFile, "Date          : %s\n", __DATE__);
-    fprintf(ResultFile, "Reference     : %s\n", "LKH-3");
+    fprintf(ResultFile, "Date          : %s", ctime(&Now));
+    fprintf(ResultFile, "Reference     : "
+                        "http://webhotel4.ruc.dk/~keld/research/LKH-3\n");
     fprintf(ResultFile, "Solution\n");
     N = Depot;
     Forward = N->Suc->Id != N->Id + DimensionSaved;
@@ -24,8 +29,7 @@ void SINTEF_WriteSolution(char *FileName)
         fprintf(ResultFile, "Route %d : ", Route);
         do {
             if (N->Id <= Dim && N != Depot)
-                fprintf(ResultFile, "%d%s ", N->Id - 1, /*
-                                                           N->Delivery ? "D": N->Pickup ? "P" : */ "");
+                fprintf(ResultFile, "%d ", N->Id - 1);
             NextN = Forward ? N->Suc : N->Pred;
             if (NextN->Id > DimensionSaved)
                 NextN = Forward ? NextN->Suc : NextN->Pred;

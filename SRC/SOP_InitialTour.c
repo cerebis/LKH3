@@ -14,6 +14,7 @@ GainType SOP_InitialTour()
     GainType Cost;
     Constraint *Con;
 
+    assert(Asymmetric);
     N = FirstNode;
     do
         N->InDegree = 0;

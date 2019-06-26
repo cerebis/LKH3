@@ -33,8 +33,12 @@ GainType Ascent()
     while ((t = t->Suc) != FirstNode);
     if (CandidateSetType == DELAUNAY)
         CreateDelaunayCandidateSet();
-    else if (MaxCandidates == 0)
+    else if (MaxCandidates == 0) {
         AddTourCandidates();
+        if (ExtraCandidates > 0)
+            AddExtraCandidates(ExtraCandidates, ExtraCandidateSetType,
+                               ExtraCandidateSetSymmetric);
+    }
 
     /* Compute the cost of a minimum 1-tree */
     W = Minimum1TreeCost(CandidateSetType == DELAUNAY
@@ -98,10 +102,10 @@ GainType Ascent()
             do {
                 if (t->V != 0) {
                     t->Pi += T * (7 * t->V + 3 * t->LastV) / 10;
-                    if (t->Pi > INT_MAX / 4)
-                        t->Pi = INT_MAX / 4;
-                    else if (t->Pi < -INT_MAX / 4)
-                        t->Pi = -INT_MAX / 4;
+                     if (t->Pi > INT_MAX / 10)
+                        t->Pi = INT_MAX / 10;
+                    else if (t->Pi < INT_MIN / 10)
+                        t->Pi = INT_MIN / 10;
                 }
                 t->LastV = t->V;
             }

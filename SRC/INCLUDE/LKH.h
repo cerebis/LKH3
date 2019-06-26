@@ -41,7 +41,7 @@
 
 enum Types { TSP, ATSP, SOP, TSPTW, HCP, CCVRP, CVRP, ACVRP, CVRPTW, RCTVRP, 
     RCTVRPTW, VRPB, VRPBTW, PDPTW, PDTSP, PDTSPF, PDTSPL, VRPPD, OVRP,
-    ONE_PDTSP, M_PDTSP, M1_PDTSP, TSPPD, TOUR, HPP, BWTSP, TRP
+    ONE_PDTSP, M_PDTSP, M1_PDTSP, TSPDL, TSPPD, TOUR, HPP, BWTSP, TRP
 };
 enum CoordTypes { TWOD_COORDS, THREED_COORDS, NO_COORDS };
 enum EdgeWeightTypes { EXPLICIT, EUC_2D, EUC_3D, MAX_2D, MAX_3D,
@@ -55,7 +55,7 @@ enum EdgeWeightFormats { FUNCTION, FULL_MATRIX, UPPER_ROW, LOWER_ROW,
 };
 enum CandidateSetTypes { ALPHA, DELAUNAY, NN, QUADRANT };
 enum InitialTourAlgorithms { BORUVKA, CVRP_ALG, GREEDY, MOORE, MTSP_ALG, 
-     NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, WALK
+     NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, TSPDL_ALG, WALK
 };
 enum Objectives { MINMAX, MINMAX_SIZE, MINSUM };
 
@@ -99,6 +99,7 @@ struct Node {
     int Demand;        /* Customer demand in a CVRP or 1-PDTSP instance */
     int *M_Demand;     /* Table of demands in an M-PDTSP instance */
     int Seq;           /* Sequence number in the current tour */
+    int DraftLimit;    /* Draft limit in a TSPDL instance */
     int Load;          /* Accumulated load in the current route */
     Node *Pred, *Suc;  /* Predecessor and successor node in 
                           the two-way list of nodes */
@@ -374,6 +375,7 @@ PenaltyFunction Penalty;
 
 int Distance_1(Node * Na, Node * Nb);
 int Distance_LARGE(Node * Na, Node * Nb);
+int Distance_Asymmetric(Node * Na, Node * Nb);
 int Distance_ATSP(Node * Na, Node * Nb);
 int Distance_ATT(Node * Na, Node * Nb);
 int Distance_CEIL_2D(Node * Na, Node * Nb);
@@ -521,6 +523,7 @@ GainType Penalty_PDTSPL(void);
 GainType Penalty_SOP(void);
 GainType Penalty_RCTVRP(void);
 GainType Penalty_TRP(void);
+GainType Penalty_TSPDL(void);
 GainType Penalty_TSPPD(void);
 GainType Penalty_TSPTW(void);
 GainType Penalty_VRPB(void);
@@ -543,7 +546,7 @@ Node *RemoveFirstActive(void);
 void ResetCandidateSet(void);
 void RestoreTour(void);
 int SegmentSize(Node * ta, Node * tb);
-void SINTEF_WriteSolution(char * FileName);
+void SINTEF_WriteSolution(char * FileName, GainType Cost);
 GainType SFCTour(int CurveType);
 void SolveCompressedSubproblem(int CurrentSubproblem, int Subproblems, 
                                GainType * GlobalBestCost);
@@ -565,6 +568,7 @@ void StatusReport(GainType Cost, double EntryTime, char * Suffix);
 void StoreTour(void);
 void SRandom(unsigned seed);
 void SymmetrizeCandidateSet(void);
+GainType TSPDL_InitialTour(void);
 GainType TSPTW_MakespanCost(void);
 void TSPTW_Reduce(void);
 void TrimCandidateSet(int MaxCandidates);

@@ -35,17 +35,18 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        MakeKOptMove.o MergeTourWithBestTour.o MergeWithTour.o          \
        Minimum1TreeCost.o MinimumSpanningTree.o                        \
        MTSP2TSP.o MTSP_InitialTour.o MTSP_Report.o                     \
-	   MTSP_WriteSolution.o                                            \
+       MTSP_WriteSolution.o                                            \
        NormalizeNodeList.o NormalizeSegmentList.o                      \
        OrderCandidateSet.o PatchCycles.o                               \
        Penalty_ACVRP.o Penalty_BWTSP.o Penalty_CCVRP.o                 \
        Penalty_CVRP.o Penalty_CVRPTW.o                                 \
-       Penalty_1_PDTSP.o Penalty_M_PDTSP.o Penalty_M1_PDTSP.o          \
+	   Penalty_1_PDTSP.o Penalty_M_PDTSP.o Penalty_M1_PDTSP.o          \
        Penalty_MTSP.o Penalty_OVRP.o Penalty_PDPTW.o Penalty_PDTSP.o   \
        Penalty_PDTSPF.o Penalty_PDTSPL.o Penalty_RCTVRP.o              \
-       Penalty_SCVRPTW.o Penalty_SOP.o Penalty_TRP.o Penalty_TSPPD.o   \
-       Penalty_TSPTW.o Penalty_VRPB.o Penalty_VRPBTW.o Penalty_VRPPD.o \
-       PDPTW_Reduce.o printff.o PrintParameters.o qsort.o              \
+       Penalty_SCVRPTW.o Penalty_SOP.o Penalty_TRP.o Penalty_TSPDL.o   \
+       Penalty_TSPPD.o Penalty_TSPTW.o Penalty_VRPB.o                  \
+       Penalty_VRPBTW.o Penalty_VRPPD.o                                \
+       PDPTW_Reduce.o printff.o PrintParameters.o                      \
        Random.o ReadCandidates.o ReadLine.o ReadParameters.o           \
        ReadPenalties.o ReadProblem.o RecordBestTour.o                  \
        RecordBetterTour.o RemoveFirstActive.o                          \
@@ -58,8 +59,8 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        SolveSubproblemBorderProblems.o SolveTourSegmentSubproblems.o   \
        SOP_InitialTour.o SOP_Report.o StatusReport.o                   \
        Statistics.o StoreTour.o SymmetrizeCandidateSet.o               \
-       TrimCandidateSet.o TSPTW_MakespanCost.o TSPTW_Reduce.o          \
-       VRPB_Reduce.o BIT.o                                             \
+       TrimCandidateSet.o TSPDL_InitialTour.o TSPTW_MakespanCost.o     \
+	   TSPTW_Reduce.o VRPB_Reduce.o BIT.o                              \
        WriteCandidates.o WritePenalties.o WriteTour.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))

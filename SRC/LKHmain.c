@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
         CurrentPenalty = BestPenalty;
         MTSP_Report(BestPenalty, BestCost);
         MTSP_WriteSolution(MTSPSolutionFileName, BestPenalty, BestCost);
-        SINTEF_WriteSolution(SINTEFSolutionFileName);
+        SINTEF_WriteSolution(SINTEFSolutionFileName, BestCost);
     }
     if (ProblemType == ACVRP ||
         ProblemType == BWTSP ||

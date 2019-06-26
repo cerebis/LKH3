@@ -36,6 +36,8 @@ int C_FUNCTION(Node * Na, Node * Nb)
     Candidate *Cand;
     int Index, i, j;
 
+    if (CostMatrix)
+        return D(Na, Nb);
     if (PredSucCostAvailable) {
         if (Na->Suc == Nb)
             return Na->SucCost;
@@ -82,6 +84,8 @@ int D_FUNCTION(Node * Na, Node * Nb)
 
 int c_ATT(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) (ceil(Scale * 0.31622 * fabs(Na->X - Nb->X))),
         dy = (int) (ceil(Scale * 0.31622 * fabs(Na->Y - Nb->Y)));
     return (dx > dy ? dx : dy) * Precision + Na->Pi + Nb->Pi;
@@ -89,6 +93,8 @@ int c_ATT(Node * Na, Node * Nb)
 
 int c_CEIL_2D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) ceil(Scale * fabs(Na->X - Nb->X)),
         dy = (int) ceil(Scale * fabs(Na->Y - Nb->Y));
     return (dx > dy ? dx : dy) * Precision + Na->Pi + Nb->Pi;
@@ -96,6 +102,8 @@ int c_CEIL_2D(Node * Na, Node * Nb)
 
 int c_CEIL_3D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) ceil(Scale * fabs(Na->X - Nb->X)),
         dy = (int) ceil(Scale * fabs(Na->Y - Nb->Y)),
         dz = (int) ceil(Scale * fabs(Na->Z - Nb->Z));
@@ -108,6 +116,8 @@ int c_CEIL_3D(Node * Na, Node * Nb)
 
 int c_EUC_2D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) (Scale * fabs(Na->X - Nb->X) + 0.5),
         dy = (int) (Scale * fabs(Na->Y - Nb->Y) + 0.5);
     return (dx > dy ? dx : dy) * Precision + Na->Pi + Nb->Pi;
@@ -115,6 +125,8 @@ int c_EUC_2D(Node * Na, Node * Nb)
 
 int c_EUC_3D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) (Scale * fabs(Na->X - Nb->X) + 0.5),
         dy = (int) (Scale * fabs(Na->Y - Nb->Y) + 0.5),
         dz = (int) (Scale * fabs(Na->Z - Nb->Z) + 0.5);
@@ -127,6 +139,8 @@ int c_EUC_3D(Node * Na, Node * Nb)
 
 int c_FLOOR_2D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) floor(Scale * fabs(Na->X - Nb->X)),
         dy = (int) floor(Scale * fabs(Na->Y - Nb->Y));
     return (dx > dy ? dx : dy) * Precision + Na->Pi + Nb->Pi;
@@ -134,6 +148,8 @@ int c_FLOOR_2D(Node * Na, Node * Nb)
 
 int c_FLOOR_3D(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) floor(Scale * fabs(Na->X - Nb->X)),
         dy = (int) floor(Scale * fabs(Na->Y - Nb->Y)),
         dz = (int) floor(Scale * fabs(Na->Z - Nb->Z));
@@ -149,6 +165,8 @@ int c_FLOOR_3D(Node * Na, Node * Nb)
 
 int c_GEO(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int da = (int) Na->X, db = (int) Nb->X;
     double ma = Na->X - da, mb = Nb->X - db;
     int dx =
@@ -163,6 +181,8 @@ int c_GEO(Node * Na, Node * Nb)
 
 int c_GEOM(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) (M_RRR * M_PI / 180.0 * fabs(Na->X - Nb->X) + 1.0);
     return dx * Precision + Na->Pi + Nb->Pi;
 }
@@ -171,6 +191,8 @@ int c_GEOM(Node * Na, Node * Nb)
 
 int c_GEO_MEEUS(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int da = (int) Na->X, db = (int) Nb->X;
     double ma = Na->X - da, mb = Nb->X - db;
     int dx =
@@ -181,6 +203,8 @@ int c_GEO_MEEUS(Node * Na, Node * Nb)
 
 int c_GEOM_MEEUS(Node * Na, Node * Nb)
 {
+    if (Fixed(Na, Nb))
+        return Na->Pi + Nb->Pi;
     int dx = (int) (M_RRR * M_PI / 180.0 * fabs(Na->X - Nb->X) * f + 0.5);
     return dx * Precision + Na->Pi + Nb->Pi;
 }

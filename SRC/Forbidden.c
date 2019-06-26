@@ -13,7 +13,7 @@ int Forbidden(Node * Na, Node * Nb)
     if ((Salesmen == 1 &&
          (ProblemType == TSP ||
           ProblemType == HCP || ProblemType == HPP)) ||
-        FixedOrCommon(Na, Nb))
+        Na->Id == 0 || Nb->Id == 0)
         return 0;
     if (Asymmetric &&
         (Na->Id <= DimensionSaved) == (Nb->Id <= DimensionSaved))
@@ -22,7 +22,7 @@ int Forbidden(Node * Na, Node * Nb)
         ((Na->Id == 1 && Nb->Id == Dimension + 1) ||
          (Na->Id == Dimension + 1 && Nb->Id == 1)))
         return 1;
-    if (Na->Head &&
+    if (Na->Head && !FixedOrCommon(Na, Nb) &&
         (Na->Head == Nb->Head ||
          (Na->Head != Na && Na->Tail != Na) ||
          (Nb->Head != Nb && Nb->Tail != Nb)))

@@ -88,18 +88,22 @@ void CreateDelaunayCandidateSet()
         AddTourCandidates();
         /* Add quadrant neighbors if any node has less than two candidates. 
            That is, if it should happen that delaunay_edges fails. */
-        From = FirstNode;
-        do {
-            if (From->CandidateSet == 0 ||
-                From->CandidateSet[0].To == 0 ||
-                From->CandidateSet[1].To == 0) {
-                if (TraceLevel >= 2)
-                    printff("*** Not complete ***\n");
-                AddExtraCandidates(CoordType == THREED_COORDS ? 8 : 4,
-                                   QUADRANT, 1);
-                break;
-            }
-        } while ((From = From->Suc) != FirstNode);
+        if (ExtraCandidates < 2) {
+            /* Add quadrant neighbors if any node has less than two candidates.
+             That is, if it should happen that delaunay_edges fails. */
+            From = FirstNode;
+            do {
+                if (From->CandidateSet == 0 ||
+                    From->CandidateSet[0].To == 0 ||
+                    From->CandidateSet[1].To == 0) {
+                    if (TraceLevel >= 2)
+                        printff("*** Not complete ***\n");
+                    AddExtraCandidates(CoordType == THREED_COORDS ? 8 : 4,
+                                       QUADRANT, 1);
+                    break;
+                }
+            } while ((From = From->Suc) != FirstNode);
+        }
         if (TraceLevel >= 2)
             printff("done\n");
     }

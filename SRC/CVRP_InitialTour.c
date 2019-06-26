@@ -4,7 +4,7 @@
  * Clarke and Wright savings algorithm.
  */
 
-#define ITERATIONS 10000
+#define ITERATIONS 100
 
 #define Degree V
 #define Size LastV
@@ -18,9 +18,7 @@ static int compareValue(const void *s1, const void *s2);
 static void CreateS();
 
 typedef struct Saving {
-    int Value;
-    Node *Ni, *Nj;
-    struct Saving *Next;
+    int Value, i, j;
 } Saving;
 
 static Saving *S;
@@ -35,6 +33,7 @@ GainType CVRP_InitialTour()
 
     if (TraceLevel >= 1)
         printff("CVRP = ");
+    assert(!Asymmetric);
     if (!S)
         CreateS();
     for (it = 0; it < ITERATIONS; it++) {
@@ -49,7 +48,8 @@ GainType CVRP_InitialTour()
             Tour->Size = 1;
         }
         MakeSets();
-        Distribute(1, 0.05);
+        if (it > 1)
+            Distribute(1, 0.01);
         if (Sets > Salesmen)
             Distribute(1, 0);
         if (Sets > Salesmen) {
@@ -120,8 +120,12 @@ GainType CVRP_InitialTour()
         else
             printff(GainFormat, Cost);
         if (Optimum != MINUS_INFINITY && Optimum != 0)
-            printff(", Gap = %0.1f%%", 100.0 * (Cost - Optimum) / Optimum);
+            printff(", Gap = %0.2f%%", 100.0 * (Cost - Optimum) / Optimum);
         printff(", Time = %0.2f sec.\n", fabs(GetTime() - EntryTime));
+    }
+    if (Run == Runs) {
+        free(S);
+        S = 0;
     }
     return Cost;
 }
@@ -132,9 +136,9 @@ void CreateS()
     Node *Ni, *Nj;
     SSize = 0;
     assert(S =
-           (Saving *) malloc((1 + Dim) * (1 + Dim) / 2 * sizeof(Saving)));
+           (Saving *) malloc((Dim - 2) * (Dim - 1) / 2 * sizeof(Saving)));
     /* Compute savings */
-    for (i = 1; i <= Dim; i++) {
+    for (i = 1; i < Dim; i++) {
         Ni = &NodeSet[i];
         if (Ni == Depot)
             continue;
@@ -145,8 +149,8 @@ void CreateS()
             S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX :
                 OldDistance(Ni, Depot) +
                 OldDistance(Depot, Nj) - OldDistance(Ni, Nj);
-            S[SSize].Ni = Ni;
-            S[SSize].Nj = Nj;
+            S[SSize].i = i;
+            S[SSize].j = j;
             SSize++;
         }
     }
@@ -211,8 +215,8 @@ static void Distribute(int Constrained, double R)
     for (i = 0; i < SSize && Sets > Salesmen; i++) {
         if (R > 0 && Random() % 1000 <= 1000 * R)
             continue;
-        Ni = S[i].Ni;
-        Nj = S[i].Nj;
+        Ni = &NodeSet[S[i].i];
+        Nj = &NodeSet[S[i].j];
         if (Ni->Degree < 2 && Nj->Degree < 2 && !Forbidden(Ni, Nj)) {
             u = Find(Ni);
             v = Find(Nj);

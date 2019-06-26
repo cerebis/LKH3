@@ -9,8 +9,8 @@
  * or a non-sequential 4- or 6-pt move, that improves the tour.
  * Otherwise, it finds the best feasible 5-opt move.
  *
- * If MoveType < 5, then only sequential 2- or 3-opt moves, and non-sequential
- * 4-opt moves, are tried. 
+ * If K < 5, then only sequential 2- or 3-opt moves, and non-sequential
+ * 4-opt moves are tried.
  * 
  * The function is called from the LinKernighan function.
  */
@@ -35,6 +35,7 @@ Node *BestSpecialOptMove(Node * t1, Node * t2, GainType * G0,
     OldSwaps = Swaps;
     if (t2 != SUC(t1))
         Reversed ^= 1;
+    K = Swaps == 0 ? MoveType : SubsequentMoveType;
 
     /* Choose (t2,t3) as a candidate edge emanating from t2 */
     for (Nt2 = t2->CandidateSet; (t3 = Nt2->To); Nt2++) {
@@ -108,7 +109,7 @@ Node *BestSpecialOptMove(Node * t1, Node * t2, GainType * G0,
                             }
                         }
                     }
-                    if (MoveType < 5) {
+                    if (K < 5) {
                         if (GainCriterionUsed && G4 - Precision < t6->Cost)
                             continue;
                         if (!Backtracking || Swaps > 0) {
@@ -284,7 +285,7 @@ Node *BestSpecialOptMove(Node * t1, Node * t2, GainType * G0,
                     }
                 }
             }
-            if (MoveType < 5)
+            if (K < 5)
                 continue;
             /* Try special 5-opt */
             for (Case = 1; Case <= 33; Case++) {
