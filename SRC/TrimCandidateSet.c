@@ -11,7 +11,7 @@ void TrimCandidateSet(int MaxCandidates)
     Candidate *NFrom;
     int Count, MaxDepotCandidates, MaxCand;
 
-    MaxDepotCandidates = Dimension == 2 * DimensionSaved ?
+    MaxDepotCandidates = Dimension == DimensionSaved ?
         Salesmen : 2 * Salesmen;
     if (MaxDepotCandidates < MaxCandidates)
         MaxDepotCandidates = MaxCandidates;

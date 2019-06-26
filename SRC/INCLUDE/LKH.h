@@ -41,7 +41,8 @@
 
 enum Types { TSP, ATSP, SOP, TSPTW, HCP, CCVRP, CVRP, ACVRP, CVRPTW, RCTVRP, 
     RCTVRPTW, VRPB, VRPBTW, PDPTW, PDTSP, PDTSPF, PDTSPL, VRPPD, OVRP,
-    ONE_PDTSP, M_PDTSP, M1_PDTSP, TSPDL, TSPPD, TOUR, HPP, BWTSP, TRP
+    ONE_PDTSP, MLP, M_PDTSP, M1_PDTSP, TSPDL, TSPPD, TOUR, HPP, BWTSP, TRP,
+    CTSP
 };
 enum CoordTypes { TWOD_COORDS, THREED_COORDS, NO_COORDS };
 enum EdgeWeightTypes { EXPLICIT, EUC_2D, EUC_3D, MAX_2D, MAX_3D,
@@ -54,8 +55,9 @@ enum EdgeWeightFormats { FUNCTION, FULL_MATRIX, UPPER_ROW, LOWER_ROW,
     UPPER_DIAG_COL, LOWER_DIAG_COL
 };
 enum CandidateSetTypes { ALPHA, DELAUNAY, NN, POPMUSIC, QUADRANT };
-enum InitialTourAlgorithms { BORUVKA, CVRP_ALG, GREEDY, MOORE, MTSP_ALG, 
-     NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, TSPDL_ALG, WALK
+enum InitialTourAlgorithms { BORUVKA, CTSP_ALG, CVRP_ALG, GREEDY, MOORE,
+    MTSP_ALG, NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG,
+    TSPDL_ALG, WALK
 };
 enum Objectives { MINMAX, MINMAX_SIZE, MINSUM };
 enum RecombinationTypes { IPT, GPX2 };
@@ -150,6 +152,7 @@ struct Node {
     double Earliest, Latest;
     int Backhaul;
     int Serial;
+    int Color;
     double X, Y, Z;     /* Coordinates of the node */
     double Xc, Yc, Zc;  /* Converted coordinates */
     char Axis;  /* The axis partitioned when the node is part of a KDTree */
@@ -462,6 +465,7 @@ void CreateNearestNeighborCandidateSet(int K);
 void CreateNNCandidateSet(int K);
 void Create_POPMUSIC_CandidateSet(int K);
 void CreateQuadrantCandidateSet(int K);
+GainType CTSP_InitialTour(void);
 GainType CVRP_InitialTour(void);
 void eprintf(const char *fmt, ...);
 int Excludable(Node * ta, Node * tb);
@@ -518,6 +522,7 @@ GainType PatchCycles(int k, GainType Gain);
 GainType Penalty_ACVRP(void);
 GainType Penalty_BWTSP(void);
 GainType Penalty_CCVRP(void);
+GainType Penalty_CTSP(void);
 GainType Penalty_CVRP(void);
 GainType Penalty_CVRPTW(void);
 GainType Penalty_MTSP_MINMAX(void);
@@ -525,6 +530,7 @@ GainType Penalty_MTSP_MINMAX_SIZE(void);
 GainType Penalty_MTSP_MINSUM(void);
 GainType Penalty_VRPPD(void);
 GainType Penalty_1_PDTSP(void);
+GainType Penalty_MLP(void);
 GainType Penalty_M_PDTSP(void);
 GainType Penalty_M1_PDTSP(void);
 GainType Penalty_OVRP(void);

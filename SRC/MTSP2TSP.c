@@ -29,7 +29,7 @@ void MTSP2TSP()
             Penalty = Penalty_MTSP_MINMAX_SIZE;
     } else if (ProblemType == CVRP)
         Penalty = Penalty_CVRP;
-    if (ProblemType == CVRP || ProblemType == TSP) {
+    if (ProblemType == CVRP || ProblemType == CTSP || ProblemType == TSP) {
         int NewDimension = Dimension + Salesmen - 1;
         Node *Prev = 0;
         Node *OldNodeSet = NodeSet;
@@ -47,6 +47,7 @@ void MTSP2TSP()
                 N->FixedTo2 += NodeSet - OldNodeSet;
         }
         Depot = &NodeSet[MTSPDepot];
+        Depot->Color = 0;
         FirstNode = &NodeSet[1];
         for (i = 1; i <= NewDimension; i++, Prev = N) {
             N = &NodeSet[i];
@@ -70,20 +71,22 @@ void MTSP2TSP()
             }
         }
         Dimension = DimensionSaved = NewDimension;
-        HeapMake(Dim - 1);
-        for (i = 1; i <= Dim; i++) {
-            N = &NodeSet[i];
-            if (N == Depot)
-                continue;
-            N->Rank = Distance(N, Depot);
-            HeapLazyInsert(N);
+        if (ProblemType != CTSP) {
+            HeapMake(Dim - 1);
+            for (i = 1; i <= Dim; i++) {
+                N = &NodeSet[i];
+                if (N == Depot)
+                    continue;
+                N->Rank = Distance(N, Depot);
+                HeapLazyInsert(N);
+            }
+            Heapify();
+            for (i = 1; i <= Salesmen; i++)
+                HeapDeleteMin()->Special = AnyFixed ? 0 : i;
+            HeapClear();
+            free(Heap);
+            Heap = 0;
         }
-        Heapify();
-        for (i = 1; i <= Salesmen; i++)
-            HeapDeleteMin()->Special = AnyFixed ? 0 : i;
-        HeapClear();
-        free(Heap);
-        Heap = 0;
     }
     for (i = Dim + 1; i <= DimensionSaved; i++) {
         NodeSet[i].Earliest = Depot->Earliest;

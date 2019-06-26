@@ -10,7 +10,7 @@ void MTSP_Report(GainType Penalty, GainType Cost)
 
     do {
         GainType Cost = 0;
-        int Size = 0;
+        int Size = -1;
         do {
             NextN = Forward ? SUCC(N) : PREDD(N);
             Cost += C(N, NextN) - N->Pi - NextN->Pi;

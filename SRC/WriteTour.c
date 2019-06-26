@@ -19,7 +19,8 @@ void WriteTour(char *FileName, int *Tour, GainType Cost)
     time_t Now;
 
     if (CurrentPenalty != 0 && MTSPObjective == -1 &&
-        ProblemType != CCVRP && ProblemType != TRP)
+        ProblemType != CCVRP && ProblemType != TRP &&
+        ProblemType != MLP)
         return;
     if (FileName == 0)
         return;

@@ -16,10 +16,10 @@ int Distance_MTSP(Node * Na, Node * Nb)
     if (Na->DepotId != 0 && Nb->DepotId != 0)
         return 0;
     if (DimensionSaved != Dimension) {
-        if (Na->DepotId != 0) {
+        if (Na->DepotId != 0)
             Na = Na->Id <= DimensionSaved ? Depot :
                 &NodeSet[Depot->Id + DimensionSaved];
-        } else if (Nb->DepotId != 0)
+        else if (Nb->DepotId != 0)
             Nb = Nb->Id <= DimensionSaved ? Depot :
                 &NodeSet[Depot->Id + DimensionSaved];
     } else if (Dim != Dimension) {

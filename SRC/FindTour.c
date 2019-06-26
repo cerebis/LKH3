@@ -93,6 +93,7 @@ GainType FindTour()
                 WriteTour(OutputTourFileName, BetterTour, BetterCost);
             if (StopAtOptimum) {
                 if (ProblemType != CCVRP && ProblemType != TRP &&
+                    ProblemType != MLP &&
                     MTSPObjective != MINMAX &&
                     MTSPObjective != MINMAX_SIZE ?
                     CurrentPenalty == 0 && Cost == Optimum :

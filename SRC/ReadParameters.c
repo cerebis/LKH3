@@ -122,7 +122,7 @@
  * The initial step size used in the ascent.
  * Default: 1
  *
- * INITIAL_TOUR_ALGORITHM = { BORUVKA | CVRP | GREEDY | MOORE | MTSP |
+ * INITIAL_TOUR_ALGORITHM = { BORUVKA | CTSP | CVRP | GREEDY | MOORE | MTSP |
  *       NEAREST-NEIGHBOR | QUICK-BORUVKA | SIERPINSKI | SOP | TSPDL | WALK }
  * Specifies the algorithm for obtaining an initial tour.
  * Default: WALK
@@ -203,12 +203,12 @@
  * Specifies the minimum number of cities each salesman must visit in an
  * MTSP or CVRP instance. If negative, its value is set to
  *     DIMENSION/(ceil(1.0*DIMENSION/MTSP_MAX_SIZE) + 1)
- * Default: 0
+ * Default: 1
  *
  * MTSP_MAX_SIZE = <integer>
  * Specifies the maximum number of cities each salesman may visit in an
  * MTSP or CVRP instance.
- * Default: DIMENSION-1.
+ * Default: DIMENSION-1
  *
  * MTSP_OBJECTIVE = [ MINMAX | MINMAX_SIZE | MINSUM ]
  * Specifies the objective function type for a multiple traveling salesman
@@ -743,13 +743,15 @@ void ReadParameters()
         } else if (!strcmp(Keyword, "INITIAL_TOUR_ALGORITHM")) {
             if (!(Token = strtok(0, Delimiters)))
                 eprintf("INITIAL_TOUR_ALGORITHM: "
-                        "BORUVKA, CVRP, GREEDY, MOORE, MTSP,\n"
+                        "BORUVKA, CTSP, CVRP, GREEDY, MOORE, MTSP,\n"
                         "NEAREST-NEIGHBOR, QUICK-BORUVKA, SIERPINSKI, "
                         "SOP, TSPDL, or WALK expected");
             for (i = 0; i < strlen(Token); i++)
                 Token[i] = (char) toupper(Token[i]);
             if (!strncmp(Token, "BORUVKA", strlen(Token)))
                 InitialTourAlgorithm = BORUVKA;
+            else if (!strncmp(Token, "CTSP", strlen(Token)))
+                InitialTourAlgorithm = CTSP_ALG;
             else if (!strncmp(Token, "CVRP", strlen(Token)))
                 InitialTourAlgorithm = CVRP_ALG;
             else if (!strncmp(Token, "GREEDY", strlen(Token)))

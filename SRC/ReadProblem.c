@@ -44,6 +44,7 @@
  * VRPMPD       Data for a mixed pickup and delivery problem with backhauls
  * 1-PDTSP      Data for a one-commodity pickup-and-delivery traveling
  *              salesman problem
+ * MLP          Data for a minimum latency problem
  * m-PDTSP      Data for a mulity-commodity pickup-and-delivery traveling
  *              salesman problem
  * m1-PDTSP     Data for a mulity-commodity one-to-one pickup-and-delivery
@@ -65,6 +66,7 @@
  * VRPB         Data for a vehicle routing problem with backhauls
  * VRPBTW       Data for a vehicle routing problem with backhauls and
  *              time windows
+ * CTSP         Data for a colored traveling salesman problem
  *
  * COMMENT : <string>
  * Additional comments (usually the name of the contributor or the creator of
@@ -261,11 +263,18 @@
  * This section is used for specifying VRPB instances.
  * It contains a list of backhaul nodes. This list is terminated by a -1.
  *
+ * CTSP_SET_SECTION :
+ * This section is used for specifying CTSP instances.
+ * Each entry has the following format:
+ * c v1 v2 ... vk -1, where c is the color number (colors are numbered
+ * from 1 to SALESMEN), and v1 v2 ... vk are vertices with color c
+ * (vertices are numbered from 1 to Dimension).
+ *
  * The first integer gives the number of the node. The last two integers
  * give the earliest and latest time for the node.
  *
  * DEMAND_SECTION :
- * The demands of all nodes of a CVRP are give in the form (per line)
+ * The demands of all nodes of a CVRP are given in the form (per line)
  *
  *    <integer> <integer>
  *
@@ -293,7 +302,7 @@
  * The first integer gives the number of the node.
  * The second integer gives its demand (ignored for PDTSPF, PDTSPL, VRPMPD
  * and VRPSPD instances).
- * The third and fourth number give the earliest and latest time for * the node.
+ * The third and fourth number give the earliest and latest time for the node.
  * The fifth number specifies the service time for the node.
  * The last two integers are used to specify pickup and delivery. For a PDPTW,
  * PDTSP, PDTSPF and PDTSPL instance, the first of these integers gives the
@@ -325,6 +334,7 @@ static void CreateNodes(void);
 static int FixEdge(Node * Na, Node * Nb);
 static void Read_BACKHAUL_SECTION(void);
 static void Read_CAPACITY(void);
+static void Read_CTSP_SET_SECTION(void);
 static void Read_DEMAND_DIMENSION(void);
 static void Read_DEMAND_SECTION(void);
 static void Read_DEPOT_SECTION(void);
@@ -386,6 +396,8 @@ void ReadProblem()
             Read_BACKHAUL_SECTION();
         else if (!strcmp(Keyword, "CAPACITY"))
             Read_CAPACITY();
+        else if (!strcmp(Keyword, "CTSP_SET_SECTION"))
+            Read_CTSP_SET_SECTION();
         else if (!strcmp(Keyword, "DEMAND_DIMENSION"))
             Read_DEMAND_DIMENSION();
         else if (!strcmp(Keyword, "DEMAND_SECTION"))
@@ -568,8 +580,12 @@ void ReadProblem()
         Penalty = Penalty_ACVRP;
     else if (ProblemType == CCVRP)
         Penalty = Penalty_CCVRP;
+    else if (ProblemType == CTSP)
+        Penalty = Penalty_CTSP;
     else if (ProblemType == CVRPTW)
         Penalty = Penalty_CVRPTW;
+    else if (ProblemType == MLP)
+        Penalty = Penalty_MLP;
     else if (ProblemType == OVRP)
         Penalty = Penalty_OVRP;
     else if (ProblemType == PDTSP)
@@ -678,6 +694,7 @@ void ReadProblem()
     C = WeightType == EXPLICIT ? C_EXPLICIT : C_FUNCTION;
     D = WeightType == EXPLICIT ? D_EXPLICIT : D_FUNCTION;
     if (ProblemType != CVRP && ProblemType != CVRPTW &&
+        ProblemType != CTSP &&
         ProblemType != TSP && ProblemType != ATSP) {
         M = INT_MAX / 2 / Precision;
         for (i = Dim + 1; i <= DimensionSaved; i++) {
@@ -937,6 +954,40 @@ static void Read_CAPACITY()
         eprintf("CAPACITY: Integer expected");
 }
 
+static void Read_CTSP_SET_SECTION()
+{   
+    Node *N;
+    int Id, n, *ColorUsed;
+    
+    N = FirstNode;
+    do {
+        N->Color = 0;
+    } while ((N = N->Suc) != FirstNode);
+    assert(ColorUsed = (int *) calloc(Salesmen + 1, sizeof(int)));
+    while (fscanf(ProblemFile, "%d", &Id) > 0) {
+        if (Id < 1 || Id > Salesmen)
+            eprintf("(CTSP_SET_SECTION) Color number %d outside range", Id);
+        if (ColorUsed[Id])
+            eprintf("(CTSP_SET_SECTION) Color number %d used twice", Id);
+        ColorUsed[Id] = 1;
+        for (;;) {
+            if (fscanf(ProblemFile, "%d", &n) != 1)
+                eprintf("(CTSP_SET_SECTION) Missing -1");
+            if (n == -1)
+                break; 
+             if (n < 1 || n > DimensionSaved)
+                 eprintf("(CTSP_SET_SECTION) Node %d outside range", n);
+             N = &NodeSet[n];
+             if (N->Color != 0 && N->Color != Id) 
+                 eprintf("(CTSP_SET_SECTION) Node %d in two sets", n);
+             if (N == Depot)
+                 eprintf("(CTSP_SET_SECTION) Depot %d occurs in set %d", n, Id);
+             N->Color = Id;
+        }
+    }
+    free(ColorUsed);
+}
+
 static void Read_DEMAND_DIMENSION()
 {
     char *Token = strtok(0, Delimiters);
@@ -1029,7 +1080,7 @@ static void Read_DISPLAY_DATA_SECTION()
     }
     N = FirstNode;
     do
-        if (!N->V)
+        if (!N->V && N->Id <= Dim)
             break;
     while ((N = N->Suc) != FirstNode);
     if (!N->V)
@@ -1113,7 +1164,7 @@ static void Read_EDGE_DATA_SECTION()
             WithWeights = 1;
         while (i != -1) {
             if (i <= 0 ||
-                i > (Asymmetric ? Dimension : Dimension / 2))
+                i > (!Asymmetric ? Dimension : Dimension / 2))
                 eprintf("(EDGE_DATA_SECTION) Node number out of range: %d", i);
             if (!FirstLine)
                 fscanint(ProblemFile, &j);
@@ -1926,6 +1977,8 @@ static void Read_TYPE()
         ProblemType = ACVRP;
     else if (!strcmp(Type, "CVRPTW"))
         ProblemType = CVRPTW;
+    else if (!strcmp(Type, "MLP"))
+        ProblemType = MLP;
     else if (!strcmp(Type, "OVRP"))
         ProblemType = OVRP;
     else if (!strcmp(Type, "PDPTW"))
@@ -1962,6 +2015,8 @@ static void Read_TYPE()
         ProblemType = M1_PDTSP;
     else if (!strcmp(Type, "TSPDL"))
         ProblemType = TSPDL;
+    else if (!strcmp(Type, "CTSP"))
+        ProblemType = CTSP;
     else if (!strcmp(Type, "TOUR")) {
         ProblemType = TOUR;
         eprintf("TYPE: Type not implemented: %s", Type);
@@ -1972,6 +2027,7 @@ static void Read_TYPE()
         ProblemType == CCVRP ||
         ProblemType == ACVRP ||
         ProblemType == CVRPTW ||
+        ProblemType == MLP ||
         ProblemType == M_PDTSP ||
         ProblemType == M1_PDTSP ||
         ProblemType == ONE_PDTSP ||

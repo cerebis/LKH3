@@ -44,14 +44,29 @@ void ChooseInitialTour()
     }
     if (Trial == 1 && (!FirstNode->InitialSuc || InitialTourFraction < 1)) {
         if (InitialTourAlgorithm == BORUVKA ||
+            InitialTourAlgorithm == CTSP_ALG ||
+            InitialTourAlgorithm == CVRP_ALG ||
             InitialTourAlgorithm == GREEDY ||
             InitialTourAlgorithm == MOORE ||
+            InitialTourAlgorithm == MTSP_ALG ||
             InitialTourAlgorithm == NEAREST_NEIGHBOR ||
             InitialTourAlgorithm == QUICK_BORUVKA ||
-            InitialTourAlgorithm == SIERPINSKI) {
+            InitialTourAlgorithm == SIERPINSKI ||
+            InitialTourAlgorithm == SOP_ALG ||
+            InitialTourAlgorithm == TSPDL_ALG) {
             GainType Cost = InitialTourAlgorithm == MOORE ||
-            InitialTourAlgorithm == SIERPINSKI ?
-            SFCTour(InitialTourAlgorithm) : GreedyTour();
+                InitialTourAlgorithm == SIERPINSKI ?
+                SFCTour(InitialTourAlgorithm) :
+                InitialTourAlgorithm == CTSP_ALG ?
+                CTSP_InitialTour() :
+                InitialTourAlgorithm == CVRP_ALG ?
+                CVRP_InitialTour() :
+                InitialTourAlgorithm == MTSP_ALG ?
+                MTSP_InitialTour() :
+                InitialTourAlgorithm == SOP_ALG ?
+                SOP_InitialTour() :
+                InitialTourAlgorithm == TSPDL_ALG ?
+                TSPDL_InitialTour() : GreedyTour();
             if (MaxTrials == 0) {
                 BetterCost = Cost;
                 RecordBetterTour();
@@ -80,7 +95,7 @@ Start:
     FirstNode = N;
     
     /* Move nodes with two incident fixed or common candidate edges in
-     front of FirstNode */
+       front of FirstNode */
     for (Last = FirstNode->Pred; N != Last; N = NextN) {
         NextN = N->Suc;
         if (FixedOrCommonCandidates(N) == 2)
@@ -155,7 +170,7 @@ Start:
                     Forbidden(N, NextN)) && NextN->Suc != FirstNode)
                 NextN = NextN->Suc;
             if (FixedOrCommonCandidates(NextN) == 2 || Forbidden(N, NextN)) {
-                FirstNode = FirstNode->Suc;
+                FirstNode = N;
                 goto Start;
             }
         } else {
@@ -173,7 +188,7 @@ Start:
         N->V = 1;
     }
     if (Forbidden(N, N->Suc)) {
-        FirstNode = FirstNode->Suc;
+        FirstNode = N;
         goto Start;
     }
     if (MaxTrials == 0) {
@@ -189,4 +204,3 @@ Start:
         }
     }
 }
-

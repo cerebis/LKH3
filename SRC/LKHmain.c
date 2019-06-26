@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
                                 GainFormat, i + 1, CurrentPenalty, Cost);
                     if (Optimum != MINUS_INFINITY && Optimum != 0) {
                         if (ProblemType != CCVRP && ProblemType != TRP &&
+                            ProblemType != MLP &&
                             MTSPObjective != MINMAX &&
                             MTSPObjective != MINMAX_SIZE)
                             printff(", Gap = %0.4f%%",
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
         }
         if (StopAtOptimum && MaxPopulationSize >= 1) {
             if (ProblemType != CCVRP && ProblemType != TRP &&
+                ProblemType != MLP &&
                 MTSPObjective != MINMAX &&
                 MTSPObjective != MINMAX_SIZE ?
                 CurrentPenalty == 0 && Cost == Optimum :
@@ -203,8 +205,10 @@ int main(int argc, char *argv[])
     if (ProblemType == ACVRP ||
         ProblemType == BWTSP ||
         ProblemType == CCVRP ||
+        ProblemType == CTSP ||
         ProblemType == CVRP ||
         ProblemType == CVRPTW ||
+        ProblemType == MLP ||
         ProblemType == M_PDTSP ||
         ProblemType == M1_PDTSP ||
         MTSPObjective != -1 ||
