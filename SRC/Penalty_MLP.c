@@ -4,7 +4,7 @@
 GainType Penalty_MLP()
 {
     static Node *StartRoute = 0;
-    Node *N, *NextN, *CurrentRoute;;
+    Node *N, *NextN, *CurrentRoute;
     GainType P = 0, DistanceSum;
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
 

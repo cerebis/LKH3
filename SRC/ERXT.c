@@ -44,10 +44,14 @@ void ERXT()
         N->V = 0;
     }
     while ((N = N->Suc) != FirstNode);
-    if (Dimension == DimensionSaved)
+    if (Dimension == DimensionSaved) {
         FirstNode = &NodeSet[1 + Random() % Dimension];
-    else {
+        while (FirstNode->DepotId || FirstNode->Special)
+            FirstNode = FirstNode->Suc;
+    } else {
         for (i = Random() % Dimension; i > 0; i--)
+            FirstNode = FirstNode->Suc;
+        while (FirstNode->DepotId || FirstNode->Special)
             FirstNode = FirstNode->Suc;
         if (FirstNode->Id <= DimensionSaved)
             FirstNode += DimensionSaved;

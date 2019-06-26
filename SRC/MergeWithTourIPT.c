@@ -252,5 +252,12 @@ GainType MergeWithTourIPT()
     do
         Hash ^= Rand[N->Id] * Rand[N->Suc->Id];
     while ((N = N->Suc) != First);
+    if (TraceLevel >= 2) {
+        printff("IPT: ");
+        if (Penalty)
+            printff(GainFormat "_", CurrentPenalty);
+         printff(GainFormat "\n",
+                 (Cost1 <= Cost2 ? Cost1 : Cost2) / Precision);
+    }
     return (Cost1 <= Cost2 ? Cost1 : Cost2) / Precision;
 }

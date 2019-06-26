@@ -147,10 +147,10 @@ Start:
                 if (!NextN->V && FixedOrCommonCandidates(NextN) < 2 &&
                     NN->Alpha == 0 && (InBestTour(N, NextN) ||
                                        InNextBestTour(N, NextN))) {
-                        Alternatives++;
-                        NextN->Next = FirstAlternative;
-                        FirstAlternative = NextN;
-                    }
+                    Alternatives++;
+                    NextN->Next = FirstAlternative;
+                    FirstAlternative = NextN;
+                }
             }
         }
         if (Alternatives == 0) {

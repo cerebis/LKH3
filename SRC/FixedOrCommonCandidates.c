@@ -8,15 +8,14 @@
 int FixedOrCommonCandidates(Node * N)
 {
     int Count = 0;
-    Candidate *NN;
 
-    if (N->FixedTo2)
-        return 2;
-    if (!N->FixedTo1 && MergeTourFiles < 2)
-        return 0;
-    for (NN = N->CandidateSet; NN && NN->To; NN++)
-        if (FixedOrCommon(N, NN->To))
+    Count = N->FixedTo2 ? 2 : N->FixedTo1 ? 1 : 0;
+    if (MergeTourFiles >= 2) {
+        if (!Fixed(N, N->MergeSuc[0]) && IsCommonEdge(N, N->MergeSuc[0]))
             Count++;
+        if (!Fixed(N->MergePred, N) && IsCommonEdge(N->MergePred, N))
+            Count++;
+    }
     if (Count > 2)
         eprintf("Node %d has more than two required candidate edges",
                 N->Id);

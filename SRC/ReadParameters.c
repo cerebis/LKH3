@@ -122,7 +122,7 @@
  * The initial step size used in the ascent.
  * Default: 1
  *
- * INITIAL_TOUR_ALGORITHM = { BORUVKA | CTSP | CVRP | GREEDY | MOORE | MTSP |
+ * INITIAL_TOUR_ALGORITHM = { BORUVKA | CVRP | GREEDY | MOORE | MTSP |
  *       NEAREST-NEIGHBOR | QUICK-BORUVKA | SIERPINSKI | SOP | TSPDL | WALK }
  * Specifies the algorithm for obtaining an initial tour.
  * Default: WALK
@@ -208,7 +208,7 @@
  * MTSP_MAX_SIZE = <integer>
  * Specifies the maximum number of cities each salesman may visit in an
  * MTSP or CVRP instance.
- * Default: DIMENSION-1
+ * Default: DIMENSION-1.
  *
  * MTSP_OBJECTIVE = [ MINMAX | MINMAX_SIZE | MINSUM ]
  * Specifies the objective function type for a multiple traveling salesman
@@ -330,7 +330,7 @@
  * Default: 1
  *
  * SCALE = <integer>
- * Scale factor for Euclidean and ATT instances.
+ * Scale factor. Disatnces are multiplied by this factor.
  * Default: 1
  *
  * SEED = <integer>

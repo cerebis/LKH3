@@ -42,6 +42,7 @@ void PrintParameters()
         printff("EXCESS = %g\n", Excess);
     else
         printff("# EXCESS =\n");
+    printff("EXTERNAL_SALESMEN = %d\n", ExternalSalesmen);
     printff("EXTRA_CANDIDATES = %d %s\n",
             ExtraCandidates,
             ExtraCandidateSetSymmetric ? "SYMMETRIC" : "");

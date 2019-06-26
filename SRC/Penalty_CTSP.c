@@ -9,10 +9,10 @@ GainType Penalty_CTSP()
     int Forward;
 
     N1 = Depot;
-    do ; while ((N1 = SUCC(N1))->DepotId == 0);
+    while ((N1 = SUCC(N1))->DepotId == 0);
     N2 = Depot;
-    do ; while ((N2 = PREDD(N2))->DepotId == 0);
-    Forward = N1->DepotId < N2->DepotId;
+    while ((N2 = PREDD(N2))->DepotId == 0);
+    Forward = N1 != N2 ? N1->DepotId < N2->DepotId : !Reversed;
 
     if (!StartRoute)
         StartRoute = Depot;

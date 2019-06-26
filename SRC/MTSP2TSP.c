@@ -71,7 +71,8 @@ void MTSP2TSP()
             }
         }
         Dimension = DimensionSaved = NewDimension;
-        if (ProblemType != CTSP) {
+        if (ProblemType != CTSP && Salesmen <= Dim && MTSPMinSize > 0 &&
+            !AnyFixed) {
             HeapMake(Dim - 1);
             for (i = 1; i <= Dim; i++) {
                 N = &NodeSet[i];
@@ -82,7 +83,7 @@ void MTSP2TSP()
             }
             Heapify();
             for (i = 1; i <= Salesmen; i++)
-                HeapDeleteMin()->Special = AnyFixed ? 0 : i;
+                HeapDeleteMin()->Special = i;
             HeapClear();
             free(Heap);
             Heap = 0;

@@ -20,7 +20,9 @@ int IsPossibleCandidate(Node * From, Node * To)
         return 1;
     if (From->FixedTo2 || To->FixedTo2)
         return 0;
-    if (!IsCandidate(From, To) && FixedOrCommonCandidates(From) == 2)
+    if (!IsCandidate(From, To) &&
+        (FixedOrCommonCandidates(From) == 2 ||
+         FixedOrCommonCandidates(To) == 2))
         return 0;
     if (MergeTourFiles < 2)
         return 1;

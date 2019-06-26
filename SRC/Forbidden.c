@@ -13,6 +13,7 @@ int Forbidden(Node * Na, Node * Nb)
     if ((Salesmen == 1 &&
          (ProblemType == TSP ||
           ProblemType == HCP || ProblemType == HPP)) ||
+        InInitialTour(Na, Nb) ||
         Na->Id == 0 || Nb->Id == 0)
         return 0;
     if (Asymmetric &&

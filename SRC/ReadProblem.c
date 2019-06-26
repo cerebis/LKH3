@@ -179,8 +179,7 @@
  * The number of vehicles/salesmen in a CVRP.
  *
  * SCALE : <integer>
- * Scale factor for Euclidean and ATT instances.Distances are multiplied by
- * this factor.
+ * Scale factor. Distances are multiplied by this factor.
  *
  * EOF
  * Terminates input data. The entry is optional.
@@ -316,7 +315,7 @@
  *    <integer> <real>
  *
  * The integer specifies a node number, the real its service time.
- * The depot node must also occur in this section. Their service times are 0.
+ * The depot node must also occur in this section. Its service time is 0.
  *
  * TIME_WINDOW_SECTION :
  * Time windows are given in this section. Each line is of the form
@@ -572,8 +571,8 @@ void ReadProblem()
     } else
         TSPTW_Makespan = 0;
     if (Salesmen > 1) {
-        if (Salesmen > Dim)
-            eprintf("Too many salesmen/vehicles (> DIMENSION)");
+        if (Salesmen > Dim && MTSPMinSize > 0)
+            eprintf("Too many salesmen/vehicles (>= DIMENSION)");
         MTSP2TSP();
     }
     if (ProblemType == ACVRP)
@@ -656,7 +655,7 @@ void ReadProblem()
         Depot->ServiceTime = 0;
     }
     if (CostMatrix == 0 && Dimension <= MaxMatrixDimension &&
-        Distance != 0 && Distance != Distance_1 && Distance != Distance_LARGE
+        Distance != 0 && Distance != Distance_1
         && Distance != Distance_LARGE && Distance != Distance_ATSP
         && Distance != Distance_MTSP && Distance != Distance_SPECIAL) {
         Node *Ni, *Nj;
@@ -732,7 +731,7 @@ void ReadProblem()
     if (NonsequentialMoveType == -1 ||
         NonsequentialMoveType > K + PatchingC + PatchingA - 1)
         NonsequentialMoveType = K + PatchingC + PatchingA - 1;
-    if (PatchingC >= 1 && NonsequentialMoveType >= 4) {
+    if (PatchingC >= 1) {
         BestMove = BestSubsequentMove = BestKOptMove;
         if (!SubsequentPatching && SubsequentMoveType <= 5) {
             MoveFunction BestOptMove[] =
@@ -1149,6 +1148,7 @@ static void Read_EDGE_DATA_SECTION()
 {
     Node *Ni, *Nj;
     int i, j, W = 0, WithWeights = 0, FirstLine = 1;
+    double w = 0;
     char *Line;
 
     CheckSpecificationPart();
@@ -1160,8 +1160,9 @@ static void Read_EDGE_DATA_SECTION()
         Dimension--;
     if (!strcmp(EdgeDataFormat, "EDGE_LIST")) {
         Line = ReadLine(ProblemFile);
-        if (sscanf(Line, "%d %d %d\n", &i, &j, &W) == 3)
+        if (sscanf(Line, "%d %d %lf\n", &i, &j, &w) == 3)
             WithWeights = 1;
+        W = round(Scale * w);
         while (i != -1) {
             if (i <= 0 ||
                 i > (!Asymmetric ? Dimension : Dimension / 2))
@@ -1180,8 +1181,10 @@ static void Read_EDGE_DATA_SECTION()
             Ni = &NodeSet[i];
             Nj = &NodeSet[j];
             if (WithWeights) {
-                if (!FirstLine)
-                    fscanint(ProblemFile, &W);
+                if (!FirstLine) {
+                    fscanf(ProblemFile, "%lf", &w);
+                    W = round(Scale * w);
+                }
                 W *= Precision;
             }
             AddCandidate(Ni, Nj, W, 1);
@@ -1266,8 +1269,9 @@ static void Read_EDGE_WEIGHT_FORMAT()
 
 static void Read_EDGE_WEIGHT_SECTION()
 {
-    Node *Ni, *Nj;
+    Node *Ni;
     int i, j, n, W;
+    double w;
 
     if (ProblemType == SOP && ProblemType != M1_PDTSP) {
         fscanint(ProblemFile, &n);
@@ -1301,11 +1305,12 @@ static void Read_EDGE_WEIGHT_SECTION()
         for (i = 1; i <= Dim; i++) {
             Ni = &NodeSet[i];
             for (j = 1; j <= Dim; j++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
+                if (Salesmen > 1 && W < 0)
                     eprintf("EDGE_WEIGHT_SECTION: Negative weight");
                 if (Asymmetric) {
                     Ni->C[j] = W;
@@ -1313,16 +1318,15 @@ static void Read_EDGE_WEIGHT_SECTION()
                         M = W;
                 } else if (j < i)
                     Ni->C[j] = W;
-                if (i != j && W > M)
-                    M = W;
             }
         }
         break;
     case UPPER_ROW:
         for (i = 1; i < Dim; i++) {
-            for (j = i + 1, Nj = Ni->Suc; j <= Dim; j++, Nj = Nj->Suc) {
-                if (!fscanint(ProblemFile, &W))
+            for (j = i + 1; j <= Dim; j++) {
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1339,10 +1343,9 @@ static void Read_EDGE_WEIGHT_SECTION()
     case LOWER_ROW:
         for (i = 2; i <= Dim; i++) {
             for (j = 1; j < i; j++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
-                if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
+                W = round(Scale * w);
                 if (Penalty && W < 0)
                     eprintf("EDGE_WEIGHT_SECTION: Negative weight");
                 NodeSet[i].C[j] = W;
@@ -1357,10 +1360,11 @@ static void Read_EDGE_WEIGHT_SECTION()
     case UPPER_DIAG_ROW:
         for (i = 1; i <= Dim; i++) {
             for (j = i; j <= Dim; j++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 if (j == i)
                     continue;
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1377,10 +1381,11 @@ static void Read_EDGE_WEIGHT_SECTION()
     case LOWER_DIAG_ROW:
         for (i = 1; i <= Dim; i++) {
             for (j = 1; j <= i; j++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 if (j == i)
                     continue;
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1398,8 +1403,9 @@ static void Read_EDGE_WEIGHT_SECTION()
     case UPPER_COL:
         for (j = 2; j <= Dim; j++) {
             for (i = 1; i < j; i++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1416,8 +1422,9 @@ static void Read_EDGE_WEIGHT_SECTION()
     case LOWER_COL:
         for (j = 1; j < Dim; j++) {
             for (i = j + 1; i <= Dim; i++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1434,10 +1441,11 @@ static void Read_EDGE_WEIGHT_SECTION()
     case UPPER_DIAG_COL:
         for (j = 1; j <= Dim; j++) {
             for (i = 1; i <= j; i++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 if (j == i)
                     continue;
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1454,10 +1462,11 @@ static void Read_EDGE_WEIGHT_SECTION()
     case LOWER_DIAG_COL:
         for (j = 1; j <= Dim; j++) {
             for (i = j; i <= Dim; i++) {
-                if (!fscanint(ProblemFile, &W))
+                if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 if (j == i)
                     continue;
+                W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
                     W = INT_MAX / 2 / Precision;
                 if (Penalty && W < 0)
@@ -1526,6 +1535,8 @@ static void Read_EDGE_WEIGHT_TYPE()
     } else if (!strcmp(EdgeWeightType, "EXPLICIT")) {
         WeightType = EXPLICIT;
         Distance = Distance_EXPLICIT;
+        if (Scale < 1)
+            Scale = 1;
     } else if (!strcmp(EdgeWeightType, "FLOOR_2D")) {
         WeightType = FLOOR_2D;
         Distance = Distance_FLOOR_2D;
@@ -1901,11 +1912,17 @@ static void Read_TOUR_SECTION(FILE ** File)
             } else {
                 for (i = 0; i < MergeTourFiles; i++) {
                     if (File == &MergeTourFile[i]) {
-                        if (!Na)
+                        if (!Na) {
                             Last->MergeSuc[i] = N;
-                        else {
+                            if (i == 0)
+                                N->MergePred = Last;
+                        } else {
                             Last->MergeSuc[i] = Na;
                             Na->MergeSuc[i] = N;
+                            if (i == 0) {
+                                Na->MergePred = Last;
+                                N->MergePred = Na;
+                            }
                         }
                     }
                 }

@@ -25,7 +25,7 @@ GainType MTSP_InitialTour()
             FirstNode = Route->Suc;
         Follow(Route, Route);
         Route->Cost = 0;
-        Route->V = 1;
+        Route->V = 0;
     }
     /* Insert the special nodes in their corresponding routes */
     for (i = 1; i <= Dim; i++) {

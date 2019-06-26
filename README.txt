@@ -4,20 +4,20 @@ The code is distributed for research use. The author reserves all rights to
 the code.
 
 
-INSTRUCTIONS FOR INSTALLATION: (Version 3.0.4 - July 2018)
+INSTRUCTIONS FOR INSTALLATION: (Version 3.0.5 - November 2018)
 -----------------------------
 
 The software is available in gzipped tar format:
 
-	LKH-3.0.4.tgz	(approximately 2.3 MB)
+	LKH-3.0.5.tgz	(approximately 2.3 MB)
 
 Download the software and execute the following UNIX commands:
 
-  	tar xvfz LKH-3.0.4.tgz
-   	cd LKH-3.0.4
+  	tar xvfz LKH-3.0.5.tgz
+   	cd LKH-3.0.5
 	make
 
-An executable file called LKH will now be available in the directory LKH-3.0.4.
+An executable file called LKH will now be available in the directory LKH-3.0.5.
 
 To test the installation run the program by typing ./LKH pr2392.par. 
 Then press return. The program should now solve a TSP instance with 2392 nodes.
@@ -36,10 +36,20 @@ Just edit the first line in SRC/Makefile and execute the commands
 	make clean
 	make
 
+CHANGES IN LKH-3.0.5:
+---------------------
+
+Added code for solving the open close multiple traveling salesman problem (OCMTSP). 
+New keyword
+
+    EXTERNAL_SALESMEN
+
+
 CHANGES IN LKH-3.0.4:
 ---------------------
 
-Added code for solving the colored traveling saleman problem (CTSP). The node coloring is described in a
+Added code for solving the colored traveling saleman problem (CTSP). 
+The node coloring is described in a
 
     CTSP_SET_SECTION
 

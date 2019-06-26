@@ -5,14 +5,14 @@ GainType Penalty_MTSP_MINSUM()
 {
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
     Node *N = Depot, *NextN;
-    GainType P = 0;
+    GainType P = 0, DistanceSum;
     int MinSize = INT_MAX, MaxSize = 0;
 
     do {
         int Size = -1;
         do {
-            NextN = Forward ? SUCC(N) : PREDD(N);
             Size++;
+            NextN = Forward ? SUCC(N) : PREDD(N);
             if (NextN->Id > DimensionSaved)
                 NextN = Forward ? SUCC(NextN) : PREDD(NextN);
         } while ((N = NextN)->DepotId == 0);
@@ -21,11 +21,27 @@ GainType Penalty_MTSP_MINSUM()
         if (Size > MaxSize)
             MaxSize = Size;
     } while (N != Depot);
-
     if (MTSPMaxSize < Dimension - Salesmen && MaxSize > MTSPMaxSize)
         P += MaxSize - MTSPMaxSize;
     if (MTSPMinSize >= 1 && MinSize < MTSPMinSize)
         P += MTSPMinSize - MinSize;
+    if (DistanceLimit != DBL_MAX) {
+        do {
+            if (P > CurrentPenalty ||
+                (P == CurrentPenalty && CurrentGain <= 0))
+                return CurrentPenalty + (CurrentGain > 0);
+            DistanceSum = 0;
+            do {
+                NextN = Forward ? SUCC(N) : PREDD(N);
+                DistanceSum += (C(N, NextN) - N->Pi - NextN->Pi) /
+                    Precision;
+                if (NextN->Id > DimensionSaved)
+                    NextN = Forward ? SUCC(NextN) : PREDD(NextN);
+            } while ((N = NextN)->DepotId == 0);
+            if (DistanceSum > DistanceLimit)
+                P += DistanceSum - DistanceLimit;
+        } while (N != Depot);
+    }
     return P;
 }
 

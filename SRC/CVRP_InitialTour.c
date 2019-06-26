@@ -4,7 +4,7 @@
  * Clarke and Wright savings algorithm.
  */
 
-#define ITERATIONS 100
+#define ITERATIONS 10
 
 #define Degree V
 #define Size LastV
@@ -48,7 +48,7 @@ GainType CVRP_InitialTour()
             Tour->Size = 1;
         }
         MakeSets();
-        if (it > 1)
+        if (it > 0)
             Distribute(1, 0.01);
         if (Sets > Salesmen)
             Distribute(1, 0);
@@ -71,7 +71,7 @@ GainType CVRP_InitialTour()
             }
         } while ((N = N->Suc) != FirstNode);
         while (Sets > 0) {
-            if (N->Degree <= 1 && N != Depot && N->Id <= Dim) {
+            if (N->Degree <= 1) {
                 for (s = 1; s <= Salesmen; s++) {
                     Tour = s == 1 ? Depot : &NodeSet[Dim + s - 1];
                     if (Tour->Degree <= 1 &&
@@ -144,7 +144,7 @@ void CreateS()
             continue;
         for (j = i + 1; j <= Dim; j++) {
             Nj = &NodeSet[j];
-            if (Nj == Depot)
+            if (Nj == Depot || Forbidden(Ni, Nj))
                 continue;
             S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX :
                 OldDistance(Ni, Depot) +
@@ -217,7 +217,7 @@ static void Distribute(int Constrained, double R)
             continue;
         Ni = &NodeSet[S[i].i];
         Nj = &NodeSet[S[i].j];
-        if (Ni->Degree < 2 && Nj->Degree < 2 && !Forbidden(Ni, Nj)) {
+        if (Ni->Degree < 2 && Nj->Degree < 2) {
             u = Find(Ni);
             v = Find(Nj);
             if (u == v)

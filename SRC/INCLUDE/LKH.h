@@ -131,6 +131,7 @@ struct Node {
     Node *SubproblemSuc;  /* Successor in the SUBPROBLEM_TOUR file */
     Node *SubBestPred; /* The best predecessor node in a subproblem */
     Node *SubBestSuc;  /* The best successor node in a subproblem */
+    Node *MergePred;   /* Predecessor in the first MERGE_TOUR file */
     Node **MergeSuc;   /* Successors in the MERGE_TOUR files */
     Node *Added1, *Added2; /* Pointers to the opposite end nodes
                               of added edges in a submove */
@@ -142,10 +143,6 @@ struct Node {
     Segment *Parent;   /* Parent segment of a node when the two-level
                           tree representation is used */
     Constraint *FirstConstraint;
-    int DemandSum;
-    int Size;
-    GainType DistanceSum;
-    GainType Penalty;
     double ServiceTime;
     int Pickup, Delivery;
     int DepotId;     /* Equal to Id if the node is a depot; otherwize 0 */
@@ -368,6 +365,7 @@ char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat,
     *EdgeDataFormat, *NodeCoordType, *DisplayDataType;
 int CandidateSetSymmetric, CandidateSetType, Capacity,
     CoordType, DelaunayPartitioning, DelaunayPure,
+    ExternalSalesmen,
     ExtraCandidateSetSymmetric, ExtraCandidateSetType,
     InitialTourAlgorithm,
     KarpPartitioning, KCenterPartitioning, KMeansPartitioning,

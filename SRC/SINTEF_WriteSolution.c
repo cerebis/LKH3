@@ -13,7 +13,7 @@ void SINTEF_WriteSolution(char *FileName, GainType Cost)
     FullFileName = FullName(FileName, Cost);
     Now = time(&Now);
     if (TraceLevel >= 1)
-        printff("Writing MTSP_SINTEF_SOLUTION_FILE: \"%s\" ... ",
+        printff("Writing SINTEF_SOLUTION_FILE: \"%s\" ... ",
                 FullFileName);
     assert(ResultFile = fopen(FullFileName, "w"));
     fprintf(ResultFile, "Instance name : %s\n", Name);

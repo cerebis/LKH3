@@ -4,11 +4,11 @@
 GainType Penalty_VRPB()
 {
     static Node *StartRoute = 0;
-    Node *N, *CurrentRoute;
+    Node *N, *NextN, *CurrentRoute;
     GainType DemandSum[2], P = 0;
     int Linehauls, Backhauls;
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
-
+    
     if (!StartRoute)
         StartRoute = Depot;
     if (StartRoute->Id > DimensionSaved)
@@ -18,6 +18,9 @@ GainType Penalty_VRPB()
         CurrentRoute = N;
         DemandSum[0] = DemandSum[1] = 0;
         Linehauls = Backhauls = 0;
+        NextN = Forward ? SUCC(N) : PREDD(N);
+        if (NextN->DepotId != 0 && N->DepotId != NextN->DepotId)
+            P++;
         do {
             if (N->Id <= Dim && N != Depot) {
                 if (N->Backhaul) {
@@ -42,3 +45,4 @@ GainType Penalty_VRPB()
     } while (N != StartRoute);
     return P;
 }
+
