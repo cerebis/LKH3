@@ -69,11 +69,11 @@ void Flip_SL(Node * t1, Node * t2, Node * t3)
         }
         if (P3 == P4 && P1 != P3 && P2 != P4) {
             SplitSegment(t3, t4);
+
             P3 = t3->Parent;
             P4 = t4->Parent;
         }
-    } else
-        if ((P1 == P3
+    } else if ((P1 == P3
              && abs(t3->Rank - t1->Rank) > SPLIT_CUTOFF * GroupSize)
             || (P2 == P4
                 && abs(t4->Rank - t2->Rank) > SPLIT_CUTOFF * GroupSize)) {

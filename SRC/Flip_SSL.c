@@ -50,9 +50,13 @@ void Flip_SSL(Node * t1, Node * t2, Node * t3)
             SplitSegment(t1, t2);
             P1 = t1->Parent;
             P2 = t2->Parent;
+            P3 = t3->Parent;
+            P4 = t4->Parent;
         }
         if (P3 == P4 && P1 != P3 && P2 != P4) {
             SplitSegment(t3, t4);
+            P1 = t1->Parent;
+            P2 = t2->Parent;
             P3 = t3->Parent;
             P4 = t4->Parent;
         }
@@ -135,9 +139,13 @@ void Flip_SSL(Node * t1, Node * t2, Node * t3)
                 SplitSSegment(t1, t2);
                 P1 = t1->Parent;
                 P2 = t2->Parent;
+                P3 = t3->Parent;
+                P4 = t4->Parent;
             }
             if (P3 == P4 && P1 != P3 && P2 != P4) {
                 SplitSSegment(t3, t4);
+                P1 = t1->Parent;
+                P2 = t2->Parent;
                 P3 = t3->Parent;
                 P4 = t4->Parent;
             }
@@ -239,7 +247,7 @@ void Flip_SSL(Node * t1, Node * t2, Node * t3)
                 P1 = P4;
                 P4 = Q1;
             }
-            /* Reverse the sequence of segments (P2 --> P4) */
+            /* Reverse the sequence of segments (P3 --> P1) */
             FlipSSegments(P4, P3, P2, P1);
             if (t3->Suc == t4)
                 t3->Suc = t2;

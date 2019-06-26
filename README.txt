@@ -4,20 +4,20 @@ The code is distributed for research use. The author reserves all rights to
 the code.
 
 
-INSTRUCTIONS FOR INSTALLATION: (Version 3.0.5 - November 2018)
+INSTRUCTIONS FOR INSTALLATION: (Version 3.0.6 - May 2019)
 -----------------------------
 
 The software is available in gzipped tar format:
 
-	LKH-3.0.5.tgz	(approximately 2.3 MB)
+	LKH-3.0.6.tgz	(approximately 2.3 MB)
 
 Download the software and execute the following UNIX commands:
 
-  	tar xvfz LKH-3.0.5.tgz
+  	tar xvfz LKH-3.0.6.tgz
    	cd LKH-3.0.5
 	make
 
-An executable file called LKH will now be available in the directory LKH-3.0.5.
+An executable file called LKH will now be available in the directory LKH-3.0.6.
 
 To test the installation run the program by typing ./LKH pr2392.par. 
 Then press return. The program should now solve a TSP instance with 2392 nodes.
@@ -35,6 +35,14 @@ Just edit the first line in SRC/Makefile and execute the commands
 
 	make clean
 	make
+
+CHANGES IN LKH-3.0.6:
+---------------------
+
+Added code for solving the Steiner traveling salesman problem (STTSP). 
+New keyword
+
+    REQUIRED_NODES_SECTION
 
 CHANGES IN LKH-3.0.5:
 ---------------------

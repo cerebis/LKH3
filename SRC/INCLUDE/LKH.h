@@ -42,7 +42,7 @@
 enum Types { TSP, ATSP, SOP, TSPTW, HCP, CCVRP, CVRP, ACVRP, CVRPTW, RCTVRP, 
     RCTVRPTW, VRPB, VRPBTW, PDPTW, PDTSP, PDTSPF, PDTSPL, VRPPD, OVRP,
     ONE_PDTSP, MLP, M_PDTSP, M1_PDTSP, TSPDL, TSPPD, TOUR, HPP, BWTSP, TRP,
-    CTSP
+    CTSP, STTSP
 };
 enum CoordTypes { TWOD_COORDS, THREED_COORDS, NO_COORDS };
 enum EdgeWeightTypes { EXPLICIT, EUC_2D, EUC_3D, MAX_2D, MAX_3D,
@@ -106,6 +106,7 @@ struct Node {
     int Seq;           /* Sequence number in the current tour */
     int DraftLimit;    /* Draft limit in a TSPDL instance */
     int Load;          /* Accumulated load in the current route */
+    int OriginalId;    /* The original Id in a SDVRP or STTSPinstance */
     Node *Pred, *Suc;  /* Predecessor and successor node in 
                           the two-way list of nodes */
     Node *OldPred, *OldSuc; /* Previous values of Pred and Suc */
@@ -143,6 +144,8 @@ struct Node {
     Segment *Parent;   /* Parent segment of a node when the two-level
                           tree representation is used */
     Constraint *FirstConstraint;
+    int *PathLength;
+    int **Path;
     double ServiceTime;
     int Pickup, Delivery;
     int DepotId;     /* Equal to Id if the node is a depot; otherwize 0 */
@@ -157,6 +160,7 @@ struct Node {
                                               whether one (or both) of the 
                                               adjoining nodes on the old tour 
                                               has been excluded */
+    char Required; /* Is the node required in a STTSP? */
 };
 
 /* The Candidate structure is used to represent candidate edges */
@@ -580,6 +584,7 @@ void SolveSubproblemBorderProblems(int Subproblems, GainType * GlobalCost);
 void SolveTourSegmentSubproblems(void);
 GainType SOP_InitialTour(void);
 GainType SOP_RepairTour(void);
+void STTSP2TSP(void);
 void SOP_Report(GainType Cost);
 int SpecialMove(Node * t1, Node * t2, GainType * G0, GainType * Gain);
 void StatusReport(GainType Cost, double EntryTime, char * Suffix);

@@ -22,8 +22,8 @@
 
 void MinimumSpanningTree(int Sparse)
 {
-    Node *Blue;                 /* Points to the last node included in the tree */
-    Node *NextBlue = 0;         /* Points to the provisional next node to be included */
+    Node *Blue;         /* Points to the last node included in the tree */
+    Node *NextBlue = 0; /* Points to the provisional next node to be included */
     Node *N;
     Candidate *NBlue;
     int d;

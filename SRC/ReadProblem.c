@@ -63,6 +63,7 @@
  * TRP          Data for a traveling repairman problem
  * TSPDL        Dara for a traveling salesman problem with draft limits
  * TSPPD        Data for a pickup and delivery travling salesman problem
+ * TSTSP        Data for a Steiner traveling salesman problem
  * VRPB         Data for a vehicle routing problem with backhauls
  * VRPBTW       Data for a vehicle routing problem with backhauls and
  *              time windows
@@ -309,6 +310,10 @@
  * the delivery sibling. For a VRPMPD and VRPSPD instance, the two integers
  * simply give the size of the pickup and delivery for the node.
  *
+ * REIQUIRED_NODES_SECTION :
+ * Contains a list of required nodes for a Steiner traveling salesman problem.
+ * This list is terminated * by a -1.
+ *
  * SERVICE_TIME_SECTION :
  * The service times of all nodes of a CVRP are given in the form (per line)
  *
@@ -353,6 +358,7 @@ static void Read_NAME(void);
 static void Read_NODE_COORD_SECTION(void);
 static void Read_NODE_COORD_TYPE(void);
 static void Read_PICKUP_AND_DELIVERY_SECTION(void);
+static void Read_REQUIRED_NODES_SECTION(void);
 static void Read_RISK_THRESHOLD(void);
 static void Read_SALESMEN(void);
 static void Read_SCALE(void);
@@ -437,6 +443,8 @@ void ReadProblem()
             Read_NODE_COORD_TYPE();
         else if (!strcmp(Keyword, "PICKUP_AND_DELIVERY_SECTION"))
             Read_PICKUP_AND_DELIVERY_SECTION();
+        else if (!strcmp(Keyword, "REQUIRED_NODES_SECTION"))
+            Read_REQUIRED_NODES_SECTION();
         else if (!strcmp(Keyword, "RISK_THRESHOLD"))
             Read_RISK_THRESHOLD();
         else if (!strcmp(Keyword, "SALESMEN") ||
@@ -575,6 +583,8 @@ void ReadProblem()
             eprintf("Too many salesmen/vehicles (>= DIMENSION)");
         MTSP2TSP();
     }
+    if (ProblemType == STTSP)
+        STTSP2TSP();
     if (ProblemType == ACVRP)
         Penalty = Penalty_ACVRP;
     else if (ProblemType == CCVRP)
@@ -656,6 +666,7 @@ void ReadProblem()
     }
     if (CostMatrix == 0 && Dimension <= MaxMatrixDimension &&
         Distance != 0 && Distance != Distance_1
+        && Distance != Distance_EXPLICIT
         && Distance != Distance_LARGE && Distance != Distance_ATSP
         && Distance != Distance_MTSP && Distance != Distance_SPECIAL) {
         Node *Ni, *Nj;
@@ -693,7 +704,7 @@ void ReadProblem()
     C = WeightType == EXPLICIT ? C_EXPLICIT : C_FUNCTION;
     D = WeightType == EXPLICIT ? D_EXPLICIT : D_FUNCTION;
     if (ProblemType != CVRP && ProblemType != CVRPTW &&
-        ProblemType != CTSP &&
+        ProblemType != CTSP && ProblemType != STTSP &&
         ProblemType != TSP && ProblemType != ATSP) {
         M = INT_MAX / 2 / Precision;
         for (i = Dim + 1; i <= DimensionSaved; i++) {
@@ -809,7 +820,7 @@ static void CheckSpecificationPart()
     if (Dimension < 3)
         eprintf("DIMENSION < 3 or not specified");
     if (WeightType == -1 && !Asymmetric && ProblemType != HCP &&
-        ProblemType != HPP && !EdgeWeightType)
+        ProblemType != HPP && !EdgeWeightType && ProblemType != STTSP)
         eprintf("EDGE_WEIGHT_TYPE is missing");
     if (WeightType == EXPLICIT && WeightFormat == -1 && !EdgeWeightFormat)
         eprintf("EDGE_WEIGHT_FORMAT is missing");
@@ -899,7 +910,7 @@ static void CreateNodes()
             FirstNode = N;
         else
             Link(Prev, N);
-        N->Id = i;
+        N->Id = N->OriginalId = i;
         if (MergeTourFiles >= 1)
             assert(N->MergeSuc =
                    (Node **) calloc(MergeTourFiles, sizeof(Node *)));
@@ -965,22 +976,22 @@ static void Read_CTSP_SET_SECTION()
     assert(ColorUsed = (int *) calloc(Salesmen + 1, sizeof(int)));
     while (fscanf(ProblemFile, "%d", &Id) > 0) {
         if (Id < 1 || Id > Salesmen)
-            eprintf("(CTSP_SET_SECTION) Color number %d outside range", Id);
+            eprintf("CTSP_SET_SECTION: Color number %d outside range", Id);
         if (ColorUsed[Id])
-            eprintf("(CTSP_SET_SECTION) Color number %d used twice", Id);
+            eprintf("CTSP_SET_SECTION: Color number %d used twice", Id);
         ColorUsed[Id] = 1;
         for (;;) {
             if (fscanf(ProblemFile, "%d", &n) != 1)
-                eprintf("(CTSP_SET_SECTION) Missing -1");
+                eprintf("CTSP_SET_SECTION: Missing -1");
             if (n == -1)
                 break; 
              if (n < 1 || n > DimensionSaved)
-                 eprintf("(CTSP_SET_SECTION) Node %d outside range", n);
+                 eprintf("CTSP_SET_SECTION: Node %d outside range", n);
              N = &NodeSet[n];
              if (N->Color != 0 && N->Color != Id) 
-                 eprintf("(CTSP_SET_SECTION) Node %d in two sets", n);
+                 eprintf("CTSP_SET_SECTION: Node %d in two sets", n);
              if (N == Depot)
-                 eprintf("(CTSP_SET_SECTION) Depot %d occurs in set %d", n, Id);
+                 eprintf("CTSP_SET_SECTION: Depot %d occurs in set %d", n, Id);
              N->Color = Id;
         }
     }
@@ -1076,6 +1087,9 @@ static void Read_DISPLAY_DATA_SECTION()
             eprintf("DIPLAY_DATA_SECTION: Missing X-coordinate");
         if (!fscanf(ProblemFile, "%lf", &N->Y))
             eprintf("DIPLAY_DATA_SECTION: Missing Y-coordinate");
+        if (CoordType == THREED_COORDS
+            && !fscanf(ProblemFile, "%lf", &N->Z))
+            eprintf("DIPLAY_DATA_SECTION: Missing Z-coordinate");
     }
     N = FirstNode;
     do
@@ -1140,8 +1154,8 @@ static void Read_EDGE_DATA_FORMAT()
         strcmp(EdgeDataFormat, "ADJ_LIST"))
         eprintf("Unknown EDGE_DATA_FORMAT: %s", EdgeDataFormat);
     if (SubproblemTourFileName)
-        eprintf("EDGE_DATA_FORMAT"
-                " cannot be used together with SUBPROBLEM_TOUR_FILE");
+        eprintf("EDGE_DATA_FORMAT "
+                "cannot be used together with SUBPROBLEM_TOUR_FILE");
 }
 
 static void Read_EDGE_DATA_SECTION()
@@ -1158,6 +1172,8 @@ static void Read_EDGE_DATA_SECTION()
         CreateNodes();
     if (ProblemType == HPP)
         Dimension--;
+    if (Scale < 0)
+        Scale = 1;
     if (!strcmp(EdgeDataFormat, "EDGE_LIST")) {
         Line = ReadLine(ProblemFile);
         if (sscanf(Line, "%d %d %lf\n", &i, &j, &w) == 3)
@@ -1166,15 +1182,15 @@ static void Read_EDGE_DATA_SECTION()
         while (i != -1) {
             if (i <= 0 ||
                 i > (!Asymmetric ? Dimension : Dimension / 2))
-                eprintf("(EDGE_DATA_SECTION) Node number out of range: %d", i);
+                eprintf("EDGE_DATA_SECTION: Node number out of range: %d", i);
             if (!FirstLine)
                 fscanint(ProblemFile, &j);
             if (j <= 0
                 || j > (!Asymmetric ? Dimension : Dimension / 2))
-                eprintf("(EDGE_DATA_SECTION) Node number out of range: %d",
+                eprintf("EDGE_DATA_SECTION: Node number out of range: %d",
                         j);
             if (i == j)
-                eprintf("(EDGE_DATA_SECTION) Illegal edge: %d to %d",
+                eprintf("EDGE_DATA_SECTION: Illegal edge: %d to %d",
                         i, j);
             if (Asymmetric)
                 j += Dimension / 2;
@@ -1200,7 +1216,7 @@ static void Read_EDGE_DATA_SECTION()
             if (i <= 0 ||
                 (!Asymmetric ? Dimension : Dimension / 2))
                 eprintf
-                ("(EDGE_DATA_SECTION) Node number out of range: %d",
+                ("EDGE_DATA_SECTION: Node number out of range: %d",
                  i);
             Ni = &NodeSet[i];
             fscanint(ProblemFile, &j);
@@ -1208,10 +1224,10 @@ static void Read_EDGE_DATA_SECTION()
                 if (j <= 0 ||
                     (ProblemType != ATSP ? Dimension : Dimension / 2))
                     eprintf
-                    ("(EDGE_DATA_SECTION) Node number out of range: %d",
+                    ("EDGE_DATA_SECTION: Node number out of range: %d",
                      j);
                 if (i == j)
-                    eprintf("(EDGE_DATA_SECTION) Illgal edge: %d to %d",
+                    eprintf("EDGE_DATA_SECTION: Illgal edge: %d to %d",
                             i, j);
                 if (Asymmetric)
                     j += Dimension / 2;
@@ -1223,7 +1239,7 @@ static void Read_EDGE_DATA_SECTION()
             fscanint(ProblemFile, &i);
         }
     } else
-        eprintf("(EDGE_DATA_SECTION) No EDGE_DATA_FORMAT specified");
+        eprintf("EDGE_DATA_SECTION: No EDGE_DATA_FORMAT specified");
     if (ProblemType == HPP)
         Dimension++;
     if (Asymmetric) {
@@ -1231,7 +1247,8 @@ static void Read_EDGE_DATA_SECTION()
             FixEdge(&NodeSet[i], &NodeSet[i + DimensionSaved]);
     }
     WeightType = 1;
-    MaxCandidates = ExtraCandidates = 0;
+    if (ProblemType != STTSP)
+        MaxCandidates = ExtraCandidates = 0;
     Distance = WithWeights ? Distance_LARGE : Distance_1;
 }
 
@@ -1308,10 +1325,9 @@ static void Read_EDGE_WEIGHT_SECTION()
                 if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 W = round(Scale * w);
-                if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Salesmen > 1 && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                if (j != i && W > INT_MAX / 2 / Precision)
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 if (Asymmetric) {
                     Ni->C[j] = W;
                     if (j != i && W > M)
@@ -1328,9 +1344,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[j].C[i] = W;
                 if (Asymmetric) {
                     NodeSet[i].C[j] = W;
@@ -1346,9 +1361,10 @@ static void Read_EDGE_WEIGHT_SECTION()
                 if (!fscanf(ProblemFile, "%lf", &w))
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 W = round(Scale * w);
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
                 NodeSet[i].C[j] = W;
+                if (W > INT_MAX / 2 / Precision)
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 if (Asymmetric) {
                     NodeSet[j].C[i] = W;
                     if (j != i && W > M)
@@ -1366,9 +1382,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     continue;
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[j].C[i] = W;
                 if (Asymmetric) {
                     NodeSet[j].C[i] = W;
@@ -1387,9 +1402,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     continue;
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 if (j != i)
                     NodeSet[i].C[j] = W;
                 if (Asymmetric) {
@@ -1407,9 +1421,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[j].C[i] = W;
                 if (Asymmetric) {
                     NodeSet[i].C[j] = W;
@@ -1426,9 +1439,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     eprintf("EDGE_WEIGHT_SECTION: Missing weight");
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[i].C[j] = W;
                 if (Asymmetric) {
                     NodeSet[j].C[i] = W;
@@ -1447,9 +1459,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     continue;
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[j].C[i] = W;
                 if (Asymmetric) {
                     NodeSet[i].C[j] = W;
@@ -1468,9 +1479,8 @@ static void Read_EDGE_WEIGHT_SECTION()
                     continue;
                 W = round(Scale * w);
                 if (W > INT_MAX / 2 / Precision)
-                    W = INT_MAX / 2 / Precision;
-                if (Penalty && W < 0)
-                    eprintf("EDGE_WEIGHT_SECTION: Negative weight");
+                    eprintf("EDGE_WEIGHT_SECTION: "
+                            "Weight %d > INT_MAX / 2 / PRECISION", W);
                 NodeSet[i].C[j] = W;
                 if (Asymmetric) {
                     NodeSet[j].C[i] = W;
@@ -1754,7 +1764,7 @@ static void Read_PICKUP_AND_DELIVERY_SECTION()
                     &N->Demand, &N->Earliest, &N->Latest, &N->ServiceTime,
                     &N->Pickup, &N->Delivery))
             eprintf("PICKUP_AND_DELIVERY_SECTION: "
-                    " Missing data for node %d", N->Id);
+                    "Missing data for node %d", N->Id);
         if (N->ServiceTime < 0)
             eprintf("PICKUP_AND_DELIVERY_SECTION: "
                     "Negative Service Time for node %d", N->Id);
@@ -1795,6 +1805,25 @@ static void Read_PICKUP_AND_DELIVERY_SECTION()
                             N->Pickup);
             }
         } while ((N = N->Suc) != FirstNode);
+    }
+}
+
+static void Read_REQUIRED_NODES_SECTION(void)
+{
+    int i;
+
+    CheckSpecificationPart();
+    if (!FirstNode)
+        CreateNodes();
+    if (!fscanint(ProblemFile, &i))
+        i = -1;
+    while (i != -1) {
+        if (i <= 0 || i > Dimension)
+            eprintf("REQUIRED_NODES__SECTION: Node number out of range: %d",
+                    i);
+        NodeSet[i].Required = 1;
+        if (!fscanint(ProblemFile, &i))
+            i = -1;
     }
 }
 
@@ -1875,10 +1904,10 @@ static void Read_TOUR_SECTION(FILE ** File)
     }
     for (k = 0; k <= Dimension && i != -1; k++) {
         if (i <= 0 || i > Dimension)
-            eprintf("(TOUR_SECTION) Node number out of range: %d", i);
+            eprintf("TOUR_SECTION: Node number out of range: %d", i);
         N = &NodeSet[i];
         if (N->V == 1 && k != Dimension)
-            eprintf("(TOUR_SECTION) Node number occurs twice: %d", N->Id);
+            eprintf("TOUR_SECTION: Node number occurs twice: %d", N->Id);
         N->V = 1;
         if (k == 0)
             First = Last = N;
@@ -2013,6 +2042,8 @@ static void Read_TYPE()
         ProblemType = RCTVRP;
     else if (!strcmp(Type, "RCTVRPTW"))
         ProblemType = RCTVRPTW;
+    else if (!strcmp(Type, "STTSP"))
+        ProblemType = STTSP;
     else if (!strcmp(Type, "TSPTW"))
         ProblemType = TSPTW;
     else if (!strcmp(Type, "VRPB"))

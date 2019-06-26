@@ -53,7 +53,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        RecordBetterTour.o RemoveFirstActive.o                          \
        ResetCandidateSet.o RestoreTour.o                               \
        SegmentSize.o Sequence.o SFCTour.o SolveCompressedSubproblem.o  \
-       SINTEF_WriteSolution.o SOP_RepairTour.o                         \
+       SINTEF_WriteSolution.o SOP_RepairTour.o STTSP2TSP.o             \
        SolveDelaunaySubproblems.o SolveKarpSubproblems.o               \
        SolveKCenterSubproblems.o SolveKMeansSubproblems.o              \
        SolveRoheSubproblems.o SolveSFCSubproblems.o SolveSubproblem.o  \

@@ -14,7 +14,7 @@
 void WriteTour(char *FileName, int *Tour, GainType Cost)
 {
     FILE *TourFile;
-    int i, j, n, Forward;
+    int i, j, k, n, Forward, a, b;
     char *FullFileName;
     time_t Now;
 
@@ -53,13 +53,19 @@ void WriteTour(char *FileName, int *Tour, GainType Cost)
     Forward = Asymmetric ||
         Tour[i < n ? i + 1 : 1] < Tour[i > 1 ? i - 1 : Dimension];
     for (j = 1; j <= n; j++) {
-        if (Tour[i] <= n)
-            fprintf(TourFile, "%d\n", Tour[i]);
+        if ((a = Tour[i]) <= n)
+            fprintf(TourFile, "%d\n", 
+                    ProblemType != STTSP ? a : NodeSet[a].OriginalId);
         if (Forward) {
             if (++i > n)
                 i = 1;
         } else if (--i < 1)
             i = n;
+        if (ProblemType == STTSP) {
+            b = Tour[i];
+            for (k = 0; k < NodeSet[a].PathLength[b]; k++)
+                fprintf(TourFile, "%d\n", NodeSet[a].Path[b][k]);
+        }
     }
     fprintf(TourFile, "-1\nEOF\n");
     fclose(TourFile);
